@@ -4,6 +4,7 @@
   "description": "Common standards used within MTCC",
   "main": "dist/index.js",
   "type": "module",
+  "module": "es6",
   "scripts": {
     "build": "tsc",
     "test": "jest"
