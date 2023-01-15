@@ -15,9 +15,8 @@ exports.DT_FORMATS = {
  *
  * If none of the values are entered, an error will be thrown.
  */
-function timeDurationHumanReadable(_a) {
-    var minutes = _a.minutes, hours = _a.hours, seconds = _a.seconds;
-    var min;
+function timeDurationHumanReadable({ minutes, hours, seconds, }) {
+    let min;
     if (minutes)
         min = minutes;
     else if (seconds)
@@ -28,12 +27,12 @@ function timeDurationHumanReadable(_a) {
         throw new Error("Enter either the minute, second or hour value to format.");
     }
     if (min < 60) {
-        var minutesRounded_1 = Math.floor(min);
-        var secondsRounded = Math.round((min - minutesRounded_1) * 60);
-        return "".concat(minutesRounded_1, "m").concat(secondsRounded > 0 ? " ".concat(secondsRounded, "s") : "");
+        const minutesRounded = Math.floor(min);
+        const secondsRounded = Math.round((min - minutesRounded) * 60);
+        return `${minutesRounded}m${secondsRounded > 0 ? ` ${secondsRounded}s` : ""}`;
     }
-    var hoursRounded = Math.floor(min / 60);
-    var minutesRounded = Math.floor(min - hoursRounded * 60);
-    return "".concat(hoursRounded, "h").concat(minutesRounded > 0 ? " ".concat(minutesRounded, "m") : "");
+    const hoursRounded = Math.floor(min / 60);
+    const minutesRounded = Math.floor(min - hoursRounded * 60);
+    return `${hoursRounded}h${minutesRounded > 0 ? ` ${minutesRounded}m` : ""}`;
 }
 exports.timeDurationHumanReadable = timeDurationHumanReadable;

@@ -1,11 +1,9 @@
-import { TimeDurationHumanReadableInput } from "./inputs";
-
 export const DT_FORMATS = {
   short: "DD-MMM-YY",
   long: "ddd DD-MMM-YY",
   time: "HH:mm",
   longTime: "HH:mm:ss",
-  dateAndTime: `DD-MMM-YY HH:mm`,
+  dateAndTime: "DD-MMM-YY HH:mm",
 };
 
 /**
@@ -19,7 +17,11 @@ export function timeDurationHumanReadable({
   minutes,
   hours,
   seconds,
-}: TimeDurationHumanReadableInput): string {
+}: {
+  seconds?: number;
+  minutes?: number;
+  hours?: number;
+}): string {
   let min;
   if (minutes) min = minutes;
   else if (seconds) min = seconds / 60;

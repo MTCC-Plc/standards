@@ -1,4 +1,3 @@
-import { TimeDurationHumanReadableInput } from "./inputs";
 export declare const DT_FORMATS: {
     short: string;
     long: string;
@@ -13,4 +12,8 @@ export declare const DT_FORMATS: {
  *
  * If none of the values are entered, an error will be thrown.
  */
-export declare function timeDurationHumanReadable({ minutes, hours, seconds, }: TimeDurationHumanReadableInput): string;
+export declare function timeDurationHumanReadable({ minutes, hours, seconds, }: {
+    seconds?: number;
+    minutes?: number;
+    hours?: number;
+}): string;
