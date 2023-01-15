@@ -3,5 +3,5 @@ export const DT_FORMATS = {
   long: "ddd DD-MMM-YY",
   time: "HH:mm",
   longTime: "HH:mm:ss",
-  dateAndTime: `${DT_FORMATS.short} ${DT_FORMATS.time}`,
+  dateAndTime: `DD-MMM-YY HH:mm`,
 };
