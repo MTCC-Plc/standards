@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Common standards used within MTCC",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "jest"
   },
