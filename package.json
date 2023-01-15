@@ -1,0 +1,10 @@
+{
+  "name": "standards",
+  "version": "1.0.0",
+  "description": "Common standards used within MTCC",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Mismaah Abdulla <mismaahabdulla@gmail.com>"
+}
