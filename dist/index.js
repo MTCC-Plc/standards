@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.timeDurationHumanReadable = exports.DT_FORMATS = void 0;
+exports.isLevelGradeOrAbove = exports.isGradeOrAbove = exports.isLevelOrAbove = exports.timeDurationHumanReadable = exports.DT_FORMATS = void 0;
 exports.DT_FORMATS = {
     short: "DD-MMM-YY",
     long: "ddd DD-MMM-YY",
@@ -36,3 +36,54 @@ function timeDurationHumanReadable({ minutes, hours, seconds, }) {
     return `${hoursRounded}h${minutesRounded > 0 ? ` ${minutesRounded}m` : ""}`;
 }
 exports.timeDurationHumanReadable = timeDurationHumanReadable;
+/**
+ *
+ * @returns {[boolean, number]} the first element signifies whether the
+ * condition is met, the second element is the number value of the employee level
+ */
+function isLevelOrAbove(userLevelGrade, checkLevel) {
+    let matchInt = 0;
+    // match L followed by 1 or more numbers
+    const match = userLevelGrade.match(/L[0-9]+/);
+    if (!match)
+        return [false, matchInt];
+    // remove non numeric characters
+    matchInt = parseInt(match[0].replace(/\D/g, ""));
+    if (matchInt >= checkLevel)
+        return [true, matchInt];
+    return [false, matchInt];
+}
+exports.isLevelOrAbove = isLevelOrAbove;
+/**
+ *
+ * @returns {[boolean, number]} the first element signifies whether the
+ * condition is met, the second element is the number value of the employee grade
+ */
+function isGradeOrAbove(userLevelGrade, checkGrade) {
+    let matchInt = 0;
+    // match G followed by 1 or more numbers
+    const match = userLevelGrade.match(/G[0-9]+/);
+    if (!match)
+        return [false, matchInt];
+    // remove non numeric characters
+    matchInt = parseInt(match[0].replace(/\D/g, ""));
+    if (matchInt >= checkGrade)
+        return [true, matchInt];
+    return [false, matchInt];
+}
+exports.isGradeOrAbove = isGradeOrAbove;
+function isLevelGradeOrAbove(userLevelGrade, checkLevel, checkGrade) {
+    const [_, level] = isLevelOrAbove(userLevelGrade, checkLevel);
+    // if level is greater than the check level, grade does not need to be checked
+    if (level > checkLevel)
+        return true;
+    // similarly if level is less than the check level
+    else if (level < checkLevel)
+        return false;
+    // only need to check grade if level is equal to check level
+    else {
+        const [gradeIsOrAbove, _] = isGradeOrAbove(userLevelGrade, checkGrade);
+        return gradeIsOrAbove;
+    }
+}
+exports.isLevelGradeOrAbove = isLevelGradeOrAbove;

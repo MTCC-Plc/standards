@@ -17,3 +17,16 @@ export declare function timeDurationHumanReadable({ minutes, hours, seconds, }: 
     minutes?: number;
     hours?: number;
 }): string;
+/**
+ *
+ * @returns {[boolean, number]} the first element signifies whether the
+ * condition is met, the second element is the number value of the employee level
+ */
+export declare function isLevelOrAbove(userLevelGrade: string, checkLevel: number): [boolean, number];
+/**
+ *
+ * @returns {[boolean, number]} the first element signifies whether the
+ * condition is met, the second element is the number value of the employee grade
+ */
+export declare function isGradeOrAbove(userLevelGrade: string, checkGrade: number): [boolean, number];
+export declare function isLevelGradeOrAbove(userLevelGrade: string, checkLevel: number, checkGrade: number): boolean;
