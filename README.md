@@ -8,7 +8,7 @@ Constants and functions that are standard to MTCC and that can be used across di
 npm i https://github.com/MTCC-Plc/standards#{hash of the commit}
 ```
 
-Unlike a regular install from the npm registry, this package will be fetched from github.
+Unlike a regular install from the npm registry, this package will be fetched from GitHub.
 
 In order to pin to a specific version, the hash of the commit should be passed at the end of the url. If unsure which commit to use, pick the latest one. For example:
 
@@ -27,9 +27,7 @@ dayjs(comment.createdAt).format(DATETIME_FORMATS.SHORT)
 moment(comment.createdAt).format(DATETIME_FORMATS.SHORT)
 ```
 #### Time Durations
-To display time durations in a human readable format. Enter either the total minutes, hours or seconds. Enter only one value of the three. If multiple values are entered, only one will be considered in the following order of preference: minutes, seconds, hours.
- *
- * If none of the values are entered, an error will be thrown.
+To display time durations in a human readable format. Enter either the total minutes, hours or seconds. Enter only one value of the three. If multiple values are entered, only one will be considered in the following order of preference: minutes, seconds, hours. If none of the values are entered, an error will be thrown.
 ```ts
 import { timeDurationHumanReadable } from "standards";
 timeDurationHumanReadable({seconds: 500})
