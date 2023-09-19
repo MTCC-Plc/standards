@@ -1,4 +1,10 @@
-import { isGradeOrAbove, isLevelGradeOrAbove, isLevelOrAbove } from ".";
+import {
+  isGradeOrAbove,
+  isLevelGradeOrAbove,
+  isLevelOrAbove,
+  timeDurationHumanReadable,
+} from ".";
+import { isNotNullOrUndefinedAndValidNumber } from "./helpers";
 
 test("L2G2 is level 2 or above", () => {
   expect(isLevelOrAbove("L2G2", 2)).toStrictEqual([true, 2]);
@@ -62,4 +68,48 @@ test("L4G3 is NOT level 4 and grade 6 or above", () => {
 
 test("L5G3 is level 4 and grade 6 or above", () => {
   expect(isLevelGradeOrAbove("L5G3", 4, 6)).toBe(true);
+});
+
+test("5 is a valid number", () => {
+  expect(isNotNullOrUndefinedAndValidNumber(5)).toBe(true);
+});
+
+test("-5 is a valid number", () => {
+  expect(isNotNullOrUndefinedAndValidNumber(5)).toBe(true);
+});
+
+test("'5' is NOT a valid number", () => {
+  expect(isNotNullOrUndefinedAndValidNumber("5")).toBe(false);
+});
+
+test("null is NOT a valid number", () => {
+  expect(isNotNullOrUndefinedAndValidNumber(null)).toBe(false);
+});
+
+test("undefined is NOT a valid number", () => {
+  expect(isNotNullOrUndefinedAndValidNumber(undefined)).toBe(false);
+});
+
+test("55.4 minutes is 55m 24s", () => {
+  expect(timeDurationHumanReadable({ minutes: 55.4 })).toBe("55m 24s");
+});
+
+test("1.34 hours is 1h 20m", () => {
+  expect(timeDurationHumanReadable({ hours: 1.34 })).toBe("1h 20m");
+});
+
+test("345 seconds is 5m 45s", () => {
+  expect(timeDurationHumanReadable({ seconds: 345 })).toBe("5m 45s");
+});
+
+test("0 minutes is 0m", () => {
+  expect(timeDurationHumanReadable({ minutes: 0 })).toBe("0m");
+});
+
+test("0 hours is 0m", () => {
+  expect(timeDurationHumanReadable({ hours: 0 })).toBe("0m");
+});
+
+test("0 seconds is 0m", () => {
+  expect(timeDurationHumanReadable({ seconds: 0 })).toBe("0m");
 });

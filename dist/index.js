@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isLevelGradeOrAbove = exports.isGradeOrAbove = exports.isLevelOrAbove = exports.timeDurationHumanReadable = exports.DT_FORMATS = void 0;
+const helpers_1 = require("./helpers");
 exports.DT_FORMATS = {
     short: "DD-MMM-YY",
     long: "ddd DD-MMM-YY",
@@ -17,12 +18,12 @@ exports.DT_FORMATS = {
  */
 function timeDurationHumanReadable({ minutes, hours, seconds, }) {
     let min;
-    if (minutes)
-        min = minutes;
-    else if (seconds)
-        min = seconds / 60;
-    else if (hours)
-        min = hours * 60;
+    if ((0, helpers_1.isNotNullOrUndefinedAndValidNumber)(minutes))
+        min = minutes !== null && minutes !== void 0 ? minutes : 0;
+    else if ((0, helpers_1.isNotNullOrUndefinedAndValidNumber)(seconds))
+        min = (seconds !== null && seconds !== void 0 ? seconds : 0) / 60;
+    else if ((0, helpers_1.isNotNullOrUndefinedAndValidNumber)(hours))
+        min = (hours !== null && hours !== void 0 ? hours : 0) * 60;
     else {
         throw new Error("Enter either the minute, second or hour value to format.");
     }

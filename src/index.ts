@@ -1,3 +1,5 @@
+import { isNotNullOrUndefinedAndValidNumber } from "./helpers";
+
 export const DT_FORMATS = {
   short: "DD-MMM-YY",
   long: "ddd DD-MMM-YY",
@@ -23,9 +25,10 @@ export function timeDurationHumanReadable({
   hours?: number;
 }): string {
   let min;
-  if (minutes) min = minutes;
-  else if (seconds) min = seconds / 60;
-  else if (hours) min = hours * 60;
+  if (isNotNullOrUndefinedAndValidNumber(minutes)) min = minutes ?? 0;
+  else if (isNotNullOrUndefinedAndValidNumber(seconds))
+    min = (seconds ?? 0) / 60;
+  else if (isNotNullOrUndefinedAndValidNumber(hours)) min = (hours ?? 0) * 60;
   else {
     throw new Error("Enter either the minute, second or hour value to format.");
   }
