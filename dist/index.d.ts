@@ -5,6 +5,7 @@ export declare const DT_FORMATS: {
     longTime: string;
     dateAndTime: string;
 };
+export declare const COUNTRIES: string[];
 /**
  * Enter either the total minutes, hours or seconds. Enter only one value of the
  * three. If multiple values are entered, only one will be considered in the
