@@ -102,14 +102,42 @@ test("345 seconds is 5m 45s", () => {
   expect(timeDurationHumanReadable({ seconds: 345 })).toBe("5m 45s");
 });
 
-test("0 minutes is 0m", () => {
-  expect(timeDurationHumanReadable({ minutes: 0 })).toBe("0m");
+test("0 minutes is 0s", () => {
+  expect(timeDurationHumanReadable({ minutes: 0 })).toBe("0s");
 });
 
-test("0 hours is 0m", () => {
-  expect(timeDurationHumanReadable({ hours: 0 })).toBe("0m");
+test("0 hours is 0s", () => {
+  expect(timeDurationHumanReadable({ hours: 0 })).toBe("0s");
 });
 
-test("0 seconds is 0m", () => {
-  expect(timeDurationHumanReadable({ seconds: 0 })).toBe("0m");
+test("0 seconds is 0s", () => {
+  expect(timeDurationHumanReadable({ seconds: 0 })).toBe("0s");
+});
+
+test("5 seconds is 5s", () => {
+  expect(timeDurationHumanReadable({ seconds: 5 })).toBe("5s");
+});
+
+test("empty input to throw error", () => {
+  expect(() => {
+    timeDurationHumanReadable({});
+  }).toThrowError();
+});
+
+test("undefined seconds to throw error", () => {
+  expect(() => {
+    timeDurationHumanReadable({ seconds: undefined });
+  }).toThrowError();
+});
+
+test("undefined minutes to throw error", () => {
+  expect(() => {
+    timeDurationHumanReadable({ minutes: undefined });
+  }).toThrowError();
+});
+
+test("undefined hours to throw error", () => {
+  expect(() => {
+    timeDurationHumanReadable({ hours: undefined });
+  }).toThrowError();
 });

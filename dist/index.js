@@ -273,13 +273,16 @@ function timeDurationHumanReadable({ minutes, hours, seconds, }) {
     else {
         throw new Error("Enter either the minute, second or hour value to format.");
     }
+    let minutesRounded = Math.floor(min);
+    const secondsRounded = Math.round((min - minutesRounded) * 60);
+    if (min < 1) {
+        return `${secondsRounded}s`;
+    }
     if (min < 60) {
-        const minutesRounded = Math.floor(min);
-        const secondsRounded = Math.round((min - minutesRounded) * 60);
         return `${minutesRounded}m${secondsRounded > 0 ? ` ${secondsRounded}s` : ""}`;
     }
     const hoursRounded = Math.floor(min / 60);
-    const minutesRounded = Math.floor(min - hoursRounded * 60);
+    minutesRounded = Math.floor(min - hoursRounded * 60);
     return `${hoursRounded}h${minutesRounded > 0 ? ` ${minutesRounded}m` : ""}`;
 }
 exports.timeDurationHumanReadable = timeDurationHumanReadable;
