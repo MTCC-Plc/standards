@@ -11,7 +11,7 @@ exports.HeraldModule = void 0;
 const common_1 = require("@nestjs/common");
 const herald_service_1 = require("./herald.service");
 let HeraldModule = HeraldModule_1 = class HeraldModule {
-    register(config) {
+    static register(config) {
         return {
             module: HeraldModule_1,
             providers: [

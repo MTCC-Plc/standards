@@ -16,7 +16,7 @@ export interface HeraldConfig {
     sendNotification?: string;
 }
 export declare class HeraldModule {
-    register(config: HeraldConfig): {
+    static register(config: HeraldConfig): {
         module: typeof HeraldModule;
         providers: {
             provide: typeof HeraldService;
