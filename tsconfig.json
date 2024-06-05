@@ -10,10 +10,10 @@
     "baseUrl": "./",
     "paths": {
       "standards/herald": [
-        "libs/herald/src"
+        "src/libs/herald/src"
       ],
       "standards/herald/*": [
-        "libs/herald/src/*"
+        "src/libs/herald/src/*"
       ]
     }
   },
