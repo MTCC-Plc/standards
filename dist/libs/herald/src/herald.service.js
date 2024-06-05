@@ -24,7 +24,6 @@ const axios_1 = require("axios");
 let HeraldService = class HeraldService {
     constructor(config) {
         this.config = config;
-        console.log(config);
     }
     queryHerald(endpoint, method = "get", body, arrayBuffer = false) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -83,6 +82,7 @@ let HeraldService = class HeraldService {
             const input = {
                 message,
                 recipients: [{ phone }],
+                source: this.config.source,
             };
             yield this.queryHerald("notification/sms", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.apiKey}${input.url}` : undefined, source: this.config.source }));
         });
