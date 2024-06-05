@@ -18,7 +18,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@nestjs/axios": "^0.0.5",
-    "@nestjs/common": "^8.3.1"
+    "@nestjs/axios": "^3.0.2",
+    "@nestjs/common": "^10.3.9"
   }
 }
