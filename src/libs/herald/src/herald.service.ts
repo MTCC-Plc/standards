@@ -1,26 +1,11 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import axios, { Method } from "axios";
+import { CreateNotificationInput } from "./dto/create-notification.input";
 import { HeraldConfig } from "./herald.module";
-
-interface CreateNotificationRecipient {
-  rcno?: number;
-  email?: string;
-  phone?: string;
-}
-
-export interface CreateNotificationInput {
-  message: string;
-  url?: string;
-  recipients: CreateNotificationRecipient[];
-  scopes?: ("teams" | "email" | "sms")[];
-}
 
 @Injectable()
 export class HeraldService {
-  constructor(private config: HeraldConfig) {
-    console.log(config);
-  }
-
+  constructor(private config: HeraldConfig) {}
   async queryHerald<T>(
     endpoint: string,
     method: Method = "get",
@@ -79,6 +64,7 @@ export class HeraldService {
     const input: CreateNotificationInput = {
       message,
       recipients: [{ phone }],
+      source: this.config.source,
     };
     await this.queryHerald("notification/sms", "post", {
       ...input,
