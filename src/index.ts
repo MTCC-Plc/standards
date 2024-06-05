@@ -1,5 +1,3 @@
-export * from "../libs/herald/src";
-
 import { isNotNullOrUndefinedAndValidNumber } from "./helpers";
 
 export const DT_FORMATS = {
