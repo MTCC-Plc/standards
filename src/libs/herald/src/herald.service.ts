@@ -1,48 +1,6 @@
-import { HttpService } from "@nestjs/axios";
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from "@nestjs/common";
-
-/**
- * @baseUrl Base URL of herald API
- * @apiKey API key for herald API
- * @source Source of the notifications to be generated or fetched i.e. the name
- * of the app using this service
- * @sendNotification Meant to be used in development. If false is passed,
- * notifications will not be created. If a list of rcnos are passed, will only
- * create notifications for those employees. In production, this can be either
- * be undefined, empty string or 'true'.
- */
-export interface HeraldConfig {
-  baseUrl: string;
-  apiKey: string;
-  source: string;
-  sendNotification?: string;
-}
-
-export type Method =
-  | "get"
-  | "GET"
-  | "delete"
-  | "DELETE"
-  | "head"
-  | "HEAD"
-  | "options"
-  | "OPTIONS"
-  | "post"
-  | "POST"
-  | "put"
-  | "PUT"
-  | "patch"
-  | "PATCH"
-  | "purge"
-  | "PURGE"
-  | "link"
-  | "LINK"
-  | "unlink"
-  | "UNLINK";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import axios, { Method } from "axios";
+import { HeraldConfig } from "./herald.module";
 
 interface CreateNotificationRecipient {
   rcno?: number;
@@ -59,8 +17,7 @@ export interface CreateNotificationInput {
 
 @Injectable()
 export class HeraldService {
-  private readonly logger = new Logger(HeraldService.name);
-  constructor(private config: HeraldConfig, private httpService: HttpService) {}
+  constructor(private config: HeraldConfig) {}
 
   async queryHerald<T>(
     endpoint: string,
@@ -69,7 +26,7 @@ export class HeraldService {
     arrayBuffer: boolean = false
   ): Promise<T> {
     const headers = { Authorization: this.config.apiKey };
-    const result = await this.httpService.axiosRef
+    const result = await axios
       .request({
         url: `${this.config.baseUrl}/${endpoint}`,
         method,

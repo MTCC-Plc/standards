@@ -17,21 +17,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var HeraldService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HeraldService = void 0;
-const axios_1 = require("@nestjs/axios");
 const common_1 = require("@nestjs/common");
-let HeraldService = HeraldService_1 = class HeraldService {
-    constructor(config, httpService) {
+const axios_1 = require("axios");
+let HeraldService = class HeraldService {
+    constructor(config) {
         this.config = config;
-        this.httpService = httpService;
-        this.logger = new common_1.Logger(HeraldService_1.name);
     }
     queryHerald(endpoint, method = "get", body, arrayBuffer = false) {
         return __awaiter(this, void 0, void 0, function* () {
             const headers = { Authorization: this.config.apiKey };
-            const result = yield this.httpService.axiosRef
+            const result = yield axios_1.default
                 .request({
                 url: `${this.config.baseUrl}/${endpoint}`,
                 method,
@@ -90,8 +87,8 @@ let HeraldService = HeraldService_1 = class HeraldService {
         });
     }
 };
-HeraldService = HeraldService_1 = __decorate([
+HeraldService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [Object, axios_1.HttpService])
+    __metadata("design:paramtypes", [Object])
 ], HeraldService);
 exports.HeraldService = HeraldService;
