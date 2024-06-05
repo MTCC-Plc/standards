@@ -23,7 +23,7 @@ export interface HeraldConfig {
   exports: [HeraldService],
 })
 export class HeraldModule {
-  register(config: HeraldConfig) {
+  static register(config: HeraldConfig) {
     return {
       module: HeraldModule,
       providers: [
