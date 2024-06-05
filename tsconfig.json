@@ -1,11 +1,26 @@
 {
   "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "target": "es6",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./dist",
-    "strict": true
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "standards/herald": [
+        "libs/herald/src"
+      ],
+      "standards/herald/*": [
+        "libs/herald/src/*"
+      ]
+    }
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src", "libs"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

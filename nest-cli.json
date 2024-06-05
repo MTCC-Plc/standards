@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "herald": {
+      "type": "library",
+      "root": "libs/herald",
+      "entryFile": "index",
+      "sourceRoot": "libs/herald/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/herald/tsconfig.lib.json"
+      }
+    }
+  },
+  "compilerOptions": {
+    "webpack": true
+  }
+}
