@@ -24,6 +24,7 @@ const axios_1 = require("axios");
 let HeraldService = class HeraldService {
     constructor(config) {
         this.config = config;
+        console.log(config);
     }
     queryHerald(endpoint, method = "get", body, arrayBuffer = false) {
         return __awaiter(this, void 0, void 0, function* () {

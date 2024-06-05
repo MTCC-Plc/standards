@@ -17,7 +17,9 @@ export interface CreateNotificationInput {
 
 @Injectable()
 export class HeraldService {
-  constructor(private config: HeraldConfig) {}
+  constructor(private config: HeraldConfig) {
+    console.log(config);
+  }
 
   async queryHerald<T>(
     endpoint: string,
