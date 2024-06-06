@@ -1,3 +1,4 @@
+import { DynamicModule, Type } from "@nestjs/common";
 import { HeraldService } from "./herald.service";
 /**
  * @baseUrl Base URL of herald API
@@ -15,6 +16,15 @@ export interface HeraldConfig {
     source: string;
     sendNotification?: string;
 }
+export interface HeraldModuleOptionsFactory {
+    createHeraldModuleOptions(): Promise<HeraldConfig> | HeraldConfig;
+}
+export interface HeraldModuleAsyncOptions {
+    name?: string;
+    useFactory?: (...args: unknown[]) => HeraldConfig | Promise<HeraldConfig>;
+    inject?: Array<string | symbol>;
+    imports?: Array<Type<unknown> | DynamicModule>;
+}
 export declare class HeraldModule {
     static register(config: HeraldConfig): {
         module: typeof HeraldModule;
@@ -24,4 +34,5 @@ export declare class HeraldModule {
         }[];
         exports: (typeof HeraldService)[];
     };
+    static forRootAsync(options: HeraldModuleAsyncOptions): DynamicModule;
 }
