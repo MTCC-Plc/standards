@@ -8,5 +8,5 @@ export declare class SyncNotificationInput {
     message: string;
     url?: string;
     read: boolean;
-    requestId: string;
+    requestId?: string;
 }

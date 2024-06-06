@@ -17,13 +17,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var HeraldService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HeraldService = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("axios");
-let HeraldService = class HeraldService {
+let HeraldService = HeraldService_1 = class HeraldService {
     constructor(config) {
         this.config = config;
+        this.logger = new common_1.Logger(HeraldService_1.name);
     }
     queryHerald(endpoint, method = "get", body, arrayBuffer = false) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -89,8 +91,49 @@ let HeraldService = class HeraldService {
             yield this.queryHerald("notification/sms", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.apiKey}${input.url}` : undefined, source: this.config.source }));
         });
     }
+    sendEmail(email, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.config.sendNotification === "false")
+                return;
+            const input = {
+                message,
+                recipients: [{ email }],
+                source: this.config.source,
+            };
+            yield this.queryHerald("notification/email", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.apiKey}${input.url}` : undefined, source: this.config.source }));
+        });
+    }
+    get({ source, rcno, read, beforeId }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let queryParams = "?";
+            for (const param of [source, rcno, read, beforeId]) {
+                if (param)
+                    queryParams += `${param}&`;
+            }
+            yield this.queryHerald(`notification${queryParams}`, "get");
+        });
+    }
+    read(input) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.queryHerald("notification/read", "post", input);
+        });
+    }
+    readAll(input) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.queryHerald("notification/readall", "post", input);
+        });
+    }
+    syncLegacyNotifications(inputs) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (inputs.length > 1000) {
+                this.logger.warn("Syncing many notifications at once could cause crashes due to lack of memory. It is recommended to sync 1000 or less at a time.");
+            }
+            const results = yield this.queryHerald("notification/sync", "post", inputs);
+            return results;
+        });
+    }
 };
-HeraldService = __decorate([
+HeraldService = HeraldService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [Object])
 ], HeraldService);

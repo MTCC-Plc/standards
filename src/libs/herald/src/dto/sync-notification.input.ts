@@ -4,7 +4,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
-} from 'class-validator';
+} from "class-validator";
 
 export class SyncNotificationInput {
   @IsInt()
@@ -38,5 +38,5 @@ export class SyncNotificationInput {
   @IsBoolean()
   read: boolean;
 
-  requestId: string;
+  requestId?: string;
 }

@@ -49,3 +49,10 @@ isLevelOrAbove("L2G2", 2); // returns [true, 2]
 isGradeOrAbove("L2G3", 2); // returns [true, 3]
 isLevelGradeOrAbove("L5G3", 4, 6); // returns false
 ```
+
+### Libraries
+
+Nestjs libraries can also be imported.
+Check the library readmes.
+
+- [Herald:](./src/libs/herald/README.md) Integration with the herald api.

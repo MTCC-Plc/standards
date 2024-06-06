@@ -1,10 +1,20 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from "@nestjs/common";
 import axios, { Method } from "axios";
+import {
+  GetNotificationInput,
+  ReadNotificationInput,
+  SyncNotificationInput,
+} from "./dto";
 import { CreateNotificationInput } from "./dto/create-notification.input";
 import { HeraldConfig } from "./herald.module";
 
 @Injectable()
 export class HeraldService {
+  private logger = new Logger(HeraldService.name);
   constructor(private config: HeraldConfig) {}
   async queryHerald<T>(
     endpoint: string,
@@ -72,5 +82,51 @@ export class HeraldService {
       url: input.url ? `${this.config.apiKey}${input.url}` : undefined,
       source: this.config.source,
     });
+  }
+
+  async sendEmail(email: string, message: string) {
+    if (this.config.sendNotification === "false") return;
+    const input: CreateNotificationInput = {
+      message,
+      recipients: [{ email }],
+      source: this.config.source,
+    };
+    await this.queryHerald("notification/email", "post", {
+      ...input,
+      url: input.url ? `${this.config.apiKey}${input.url}` : undefined,
+      source: this.config.source,
+    });
+  }
+
+  async get({ source, rcno, read, beforeId }: GetNotificationInput) {
+    let queryParams = "?";
+    for (const param of [source, rcno, read, beforeId]) {
+      if (param) queryParams += `${param}&`;
+    }
+    await this.queryHerald(`notification${queryParams}`, "get");
+  }
+
+  async read(input: ReadNotificationInput) {
+    await this.queryHerald("notification/read", "post", input);
+  }
+
+  async readAll(input: GetNotificationInput) {
+    await this.queryHerald("notification/readall", "post", input);
+  }
+
+  async syncLegacyNotifications(
+    inputs: SyncNotificationInput[]
+  ): Promise<SyncNotificationInput[]> {
+    if (inputs.length > 1000) {
+      this.logger.warn(
+        "Syncing many notifications at once could cause crashes due to lack of memory. It is recommended to sync 1000 or less at a time."
+      );
+    }
+    const results = await this.queryHerald<SyncNotificationInput[]>(
+      "notification/sync",
+      "post",
+      inputs
+    );
+    return results;
   }
 }
