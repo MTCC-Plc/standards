@@ -1,6 +1,6 @@
 # standards
 
-Constants and functions that are standard to MTCC and that can be used across different applications to achieve consistency.
+Libraries, constants and function that are standard to MTCC and that can be used across different applications to achieve consistency.
 
 ### Installation
 
@@ -17,6 +17,13 @@ npm i https://github.com/MTCC-Plc/standards#cb32233
 ```
 
 Either the short or long hash are fine.
+
+### Libraries
+
+Nestjs libraries can be imported.
+Check the library readmes for details.
+- [Herald](./src/libs/herald/README.md): Integration with the herald api.
+
 
 ### Usage
 
@@ -50,9 +57,4 @@ isGradeOrAbove("L2G3", 2); // returns [true, 3]
 isLevelGradeOrAbove("L5G3", 4, 6); // returns false
 ```
 
-### Libraries
 
-Nestjs libraries can also be imported.
-Check the library readmes.
-
-- [Herald:](./src/libs/herald/README.md) Integration with the herald api.
