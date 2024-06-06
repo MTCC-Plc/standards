@@ -1,6 +1,7 @@
 import { Method } from "axios";
 import { GetNotificationInput, ReadNotificationInput, SyncNotificationInput } from "./dto";
 import { CreateNotificationInput } from "./dto/create-notification.input";
+import { SyncResponse } from "./dto/sync.response";
 import { HeraldConfig } from "./herald.module";
 export declare class HeraldService {
     private config;
@@ -13,5 +14,5 @@ export declare class HeraldService {
     get({ source, rcno, read, beforeId }: GetNotificationInput): Promise<void>;
     read(input: ReadNotificationInput): Promise<void>;
     readAll(input: GetNotificationInput): Promise<void>;
-    syncLegacyNotifications(inputs: SyncNotificationInput[]): Promise<SyncNotificationInput[]>;
+    syncLegacyNotifications(inputs: SyncNotificationInput[]): Promise<SyncResponse[]>;
 }

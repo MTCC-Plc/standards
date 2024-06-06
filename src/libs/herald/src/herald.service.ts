@@ -10,6 +10,7 @@ import {
   SyncNotificationInput,
 } from "./dto";
 import { CreateNotificationInput } from "./dto/create-notification.input";
+import { SyncResponse } from "./dto/sync.response";
 import { HeraldConfig } from "./herald.module";
 
 @Injectable()
@@ -116,13 +117,13 @@ export class HeraldService {
 
   async syncLegacyNotifications(
     inputs: SyncNotificationInput[]
-  ): Promise<SyncNotificationInput[]> {
+  ): Promise<SyncResponse[]> {
     if (inputs.length > 1000) {
       this.logger.warn(
         "Syncing many notifications at once could cause crashes due to lack of memory. It is recommended to sync 1000 or less at a time."
       );
     }
-    const results = await this.queryHerald<SyncNotificationInput[]>(
+    const results = await this.queryHerald<SyncResponse[]>(
       "notification/sync",
       "post",
       inputs
