@@ -29,6 +29,7 @@ export interface HeraldModuleAsyncOptions {
 export class HeraldModule {
   static register(config: HeraldConfig) {
     return {
+      global: true,
       module: HeraldModule,
       providers: [
         { provide: HeraldService, useValue: new HeraldService(config) },
@@ -45,6 +46,7 @@ export class HeraldModule {
       });
     }
     return {
+      global: true,
       module: HeraldModule,
       providers,
       exports: providers,

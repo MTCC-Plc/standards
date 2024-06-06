@@ -13,6 +13,7 @@ const herald_service_1 = require("./herald.service");
 let HeraldModule = HeraldModule_1 = class HeraldModule {
     static register(config) {
         return {
+            global: true,
             module: HeraldModule_1,
             providers: [
                 { provide: herald_service_1.HeraldService, useValue: new herald_service_1.HeraldService(config) },
@@ -29,6 +30,7 @@ let HeraldModule = HeraldModule_1 = class HeraldModule {
             });
         }
         return {
+            global: true,
             module: HeraldModule_1,
             providers,
             exports: providers,

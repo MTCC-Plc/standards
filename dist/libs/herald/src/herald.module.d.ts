@@ -21,6 +21,7 @@ export interface HeraldModuleAsyncOptions {
 }
 export declare class HeraldModule {
     static register(config: HeraldConfig): {
+        global: boolean;
         module: typeof HeraldModule;
         providers: {
             provide: typeof HeraldService;
