@@ -1,4 +1,4 @@
-import { DynamicModule, Module, Provider, Type } from "@nestjs/common";
+import { DynamicModule, Module } from "@nestjs/common";
 import { HeraldService } from "./herald.service";
 
 /**
@@ -18,40 +18,9 @@ export interface HeraldConfig {
   sendNotification?: string;
 }
 
-export interface HeraldModuleOptionsFactory {
-  createHeraldModuleOptions(): Promise<HeraldConfig> | HeraldConfig;
-}
-
 export interface HeraldModuleAsyncOptions {
-  name?: string;
   useFactory?: (...args: unknown[]) => HeraldConfig | Promise<HeraldConfig>;
-  inject?: Array<string | symbol>;
-  imports?: Array<Type<unknown> | DynamicModule>;
 }
-
-const HERALD_CONFIG = "HeraldConfig";
-const HERALD_MODULE_SERVICE = "HeraldModuleService";
-
-const createHeraldAsyncProviders = (
-  options: HeraldModuleAsyncOptions
-): Provider[] => {
-  const providers: Provider[] = [
-    {
-      provide: HERALD_MODULE_SERVICE,
-      useFactory: (config: HeraldConfig) => new HeraldService(config),
-      inject: [HERALD_CONFIG],
-    },
-  ];
-  const { useFactory } = options;
-  if (useFactory) {
-    providers.push({
-      provide: HERALD_CONFIG,
-      useFactory,
-      inject: options.inject ?? [],
-    });
-  }
-  return providers;
-};
 
 @Module({
   providers: [HeraldService],
@@ -68,12 +37,17 @@ export class HeraldModule {
     };
   }
   static forRootAsync(options: HeraldModuleAsyncOptions): DynamicModule {
-    const providers = createHeraldAsyncProviders(options);
+    const providers = [];
+    if (options.useFactory) {
+      providers.push({
+        provide: HeraldService,
+        useFactory: options.useFactory,
+      });
+    }
     return {
       module: HeraldModule,
       providers,
       exports: providers,
-      imports: options.imports,
     } as DynamicModule;
   }
 }
