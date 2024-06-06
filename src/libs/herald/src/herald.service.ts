@@ -33,6 +33,7 @@ export class HeraldService {
   }
 
   async create(input: CreateNotificationInput) {
+    const source = input.source ?? this.config.source;
     switch (this.config.sendNotification) {
       case "false":
         return;
@@ -55,7 +56,7 @@ export class HeraldService {
     await this.queryHerald("notification", "post", {
       ...input,
       url: `${this.config.baseUrl}${input.url}`,
-      source: this.config.source,
+      source,
     });
   }
 

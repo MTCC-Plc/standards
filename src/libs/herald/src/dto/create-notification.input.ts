@@ -15,7 +15,7 @@ export class CreateNotificationInput {
   recipients: NotificationRecipientInput[];
 
   @IsString()
-  source: string;
+  source?: string;
 
   @IsString()
   message: string;
