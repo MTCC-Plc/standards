@@ -12,10 +12,10 @@ import { HeraldModule } from 'standards';
 @Module({
   imports: [
     HeraldModule.register({
-      baseUrl: envConfig.HERALD_URL,
-      apiKey: envConfig.HERALD_KEY,
-      source: 'App',
-      sendNotification: envConfig.SEND_NOTIFICATION,
+      baseUrl: process.env.HERALD_URL,
+      apiKey: process.env.HERALD_KEY,
+      sendNotification: process.env.SEND_NOTIFICATION,
+      source: 'App'
     }),
   ]})
 // or if using configService or something similar
@@ -27,7 +27,7 @@ import { HeraldModule } from 'standards';
           baseUrl: configService.get('HERALD_URL'),
           apiKey: configService.get('HERALD_KEY'),
           sendNotification: configService.get('SEND_NOTIFICATION'),
-          source: 'Helpdesk',
+          source: 'App',
         };
       },
     }),
