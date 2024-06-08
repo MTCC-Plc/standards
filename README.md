@@ -1,6 +1,6 @@
 # standards
 
-Libraries, constants and function that are standard to MTCC and that can be used across different applications to achieve consistency.
+Libraries, constants and functions that are standard to MTCC and that can be used across different applications to achieve consistency.
 
 ### Installation
 
@@ -22,7 +22,7 @@ Either the short or long hash are fine.
 
 Nestjs libraries can be imported.
 Check the library readmes for details.
-- [Herald](./src/libs/herald/README.md): Integration with the herald api.
+- [Herald](./src/libs/herald/README.md) - Integration with the herald api.
 
 
 ### Usage
