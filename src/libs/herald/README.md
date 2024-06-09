@@ -15,6 +15,7 @@ import { HeraldModule } from 'standards';
       baseUrl: process.env.HERALD_URL,
       apiKey: process.env.HERALD_KEY,
       sendNotification: process.env.SEND_NOTIFICATION,
+      sourceBaseUrl: process.env.APP_URL,
       source: 'App'
     }),
   ]})
@@ -27,6 +28,7 @@ import { HeraldModule } from 'standards';
           baseUrl: configService.get('HERALD_URL'),
           apiKey: configService.get('HERALD_KEY'),
           sendNotification: configService.get('SEND_NOTIFICATION'),
+          sourceBaseUrl: configService.get('APP_URL'),
           source: 'App',
         };
       },
