@@ -52,7 +52,7 @@ let HeraldService = HeraldService_1 = class HeraldService {
         });
     }
     create(input) {
-        var _a;
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             const source = (_a = input.source) !== null && _a !== void 0 ? _a : this.config.source;
             switch (this.config.sendNotification) {
@@ -76,7 +76,7 @@ let HeraldService = HeraldService_1 = class HeraldService {
             }
             if (input.recipients.length === 0)
                 return;
-            yield this.queryHerald("notification", "post", Object.assign(Object.assign({}, input), { url: `${this.config.sourceBaseUrl}${input.url}`, source }));
+            yield this.queryHerald("notification", "post", Object.assign(Object.assign({}, input), { url: `${(_b = this.config.sourceBaseUrl) !== null && _b !== void 0 ? _b : ""}${(_c = input.url) !== null && _c !== void 0 ? _c : ""}`, source }));
         });
     }
     sendSMS(phone, message) {

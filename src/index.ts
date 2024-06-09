@@ -1,3 +1,4 @@
+export * from "./libs/cluster";
 export * from "./libs/herald/src";
 
 import { isNotNullOrUndefinedAndValidNumber } from "./helpers";

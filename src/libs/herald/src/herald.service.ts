@@ -66,7 +66,7 @@ export class HeraldService {
     if (input.recipients.length === 0) return;
     await this.queryHerald("notification", "post", {
       ...input,
-      url: `${this.config.sourceBaseUrl}${input.url}`,
+      url: `${this.config.sourceBaseUrl ?? ""}${input.url ?? ""}`,
       source,
     });
   }

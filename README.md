@@ -22,8 +22,9 @@ Either the short or long hash are fine.
 
 Nestjs libraries can be imported.
 Check the library readmes for details.
-- [Herald](./src/libs/herald/README.md) - Integration with the herald api.
 
+- [Herald](./src/libs/herald/README.md) - Integration with the herald api.
+- [Cluster](./src/libs/cluster/README.md) - Clustering a Nestjs app.
 
 ### Usage
 
@@ -56,5 +57,3 @@ isLevelOrAbove("L2G2", 2); // returns [true, 2]
 isGradeOrAbove("L2G3", 2); // returns [true, 3]
 isLevelGradeOrAbove("L5G3", 4, 6); // returns false
 ```
-
-
