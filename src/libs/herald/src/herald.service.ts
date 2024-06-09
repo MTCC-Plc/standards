@@ -23,10 +23,10 @@ export class HeraldService {
     body?: any,
     arrayBuffer: boolean = false
   ): Promise<T> {
-    const headers = { Authorization: this.config.apiKey };
+    const headers = { Authorization: this.config.heraldApiKey };
     const result = await axios
       .request({
-        url: `${this.config.baseUrl}/${endpoint}`,
+        url: `${this.config.heraldApiUrl}/${endpoint}`,
         method,
         headers,
         data: body,
@@ -66,7 +66,7 @@ export class HeraldService {
     if (input.recipients.length === 0) return;
     await this.queryHerald("notification", "post", {
       ...input,
-      url: `${this.config.baseUrl}${input.url}`,
+      url: `${this.config.sourceBaseUrl}${input.url}`,
       source,
     });
   }
@@ -80,7 +80,7 @@ export class HeraldService {
     };
     await this.queryHerald("notification/sms", "post", {
       ...input,
-      url: input.url ? `${this.config.apiKey}${input.url}` : undefined,
+      url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined,
       source: this.config.source,
     });
   }
@@ -94,7 +94,7 @@ export class HeraldService {
     };
     await this.queryHerald("notification/email", "post", {
       ...input,
-      url: input.url ? `${this.config.apiKey}${input.url}` : undefined,
+      url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined,
       source: this.config.source,
     });
   }

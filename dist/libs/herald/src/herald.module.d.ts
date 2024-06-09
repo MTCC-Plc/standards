@@ -1,19 +1,21 @@
 import { DynamicModule } from "@nestjs/common";
 import { HeraldService } from "./herald.service";
 /**
- * @baseUrl Base URL of herald API
- * @apiKey API key for herald API
+ * @heraldApiUrl URL of herald API
+ * @heraldApiKey API key for herald API
  * @source Source of the notifications to be generated or fetched i.e. the name
  * of the app using this service
+ * @sourceBaseUrl Base url of the source frontend
  * @sendNotification Meant to be used in development. If false is passed,
  * notifications will not be created. If a list of rcnos are passed, will only
  * create notifications for those employees. In production, this can be either
  * be undefined, empty string or 'true'.
  */
 export interface HeraldConfig {
-    baseUrl: string;
-    apiKey: string;
+    heraldApiUrl: string;
+    heraldApiKey: string;
     source: string;
+    sourceBaseUrl: string;
     sendNotification?: string;
 }
 export interface HeraldModuleAsyncOptions {
