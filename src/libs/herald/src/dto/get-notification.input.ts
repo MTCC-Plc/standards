@@ -11,16 +11,27 @@ export class GetNotificationInput {
 
   @Field({ nullable: true })
   @Type(() => Number)
-  rcno: number;
+  @IsOptional()
+  rcno?: number;
+
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  email?: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  phone?: string;
 
   @Field({ nullable: true })
   @Transform(({ value }) => value === "true")
   @IsOptional()
-  read: boolean;
+  read?: boolean;
 
   @Field({ nullable: true })
   @Type(() => Number)
   @IsInt()
   @IsOptional()
-  beforeId: number;
+  beforeId?: number;
 }
