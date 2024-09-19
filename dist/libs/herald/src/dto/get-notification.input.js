@@ -24,8 +24,21 @@ __decorate([
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], GetNotificationInput.prototype, "rcno", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], GetNotificationInput.prototype, "email", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], GetNotificationInput.prototype, "phone", void 0);
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     (0, class_transformer_1.Transform)(({ value }) => value === "true"),

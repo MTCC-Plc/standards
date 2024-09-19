@@ -1,6 +1,8 @@
 export declare class GetNotificationInput {
     source: string;
-    rcno: number;
-    read: boolean;
-    beforeId: number;
+    rcno?: number;
+    email?: string;
+    phone?: string;
+    read?: boolean;
+    beforeId?: number;
 }
