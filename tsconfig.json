@@ -11,18 +11,11 @@
     "strict": true,
     "baseUrl": "./",
     "paths": {
-      "standards/herald": [
-        "src/libs/herald/src"
-      ],
-      "standards/herald/*": [
-        "src/libs/herald/src/*"
-      ]
+      "standards/herald": ["src/libs/herald/src"],
+      "standards/herald/*": ["src/libs/herald/src/*"]
+      // "standards/frontend/*": ["src/frontend/*"]
     }
   },
-  "include": [
-    "src", "libs"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src", "libs"],
+  "exclude": ["node_modules"]
 }
