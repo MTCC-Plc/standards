@@ -8,7 +8,6 @@ import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { AccountInfo, IPublicClientApplication } from "@azure/msal-browser";
 import { useAccount, useMsal } from "@azure/msal-react";
-import { message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -49,7 +48,19 @@ export const getAdToken = async (
   }
 };
 
-export const useApolloClient = (uri?: string) => {
+interface ApolloClientOptions {
+  uri?: string;
+  messagePopup: any;
+}
+// jsdoc
+/**
+ *
+ * @param {ApolloClientOptions} options - The options object for the Apollo Client
+ * @param {string} options.uri - The URI of the API to be passed to Apollo Client
+ * @param {any} options.messagePopup - The message popup function, for example the 'message' function from antd
+ * @returns {ApolloClient<NormalizedCacheObject>} The Apollo Client object
+ */
+export const useApolloClient = ({ uri, messagePopup }: ApolloClientOptions) => {
   const navigate = useNavigate();
 
   if (!uri) {
@@ -84,7 +95,7 @@ export const useApolloClient = (uri?: string) => {
     const getClient = async () => {
       const [token, error] = await getAdToken(instance, account);
       if (error) {
-        message.error(error.message);
+        messagePopup.error(error.message);
         return;
       }
 

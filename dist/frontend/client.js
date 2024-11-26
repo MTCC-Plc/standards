@@ -14,7 +14,6 @@ const client_1 = require("@apollo/client");
 const context_1 = require("@apollo/client/link/context");
 const error_1 = require("@apollo/client/link/error");
 const msal_react_1 = require("@azure/msal-react");
-const antd_1 = require("antd");
 const react_1 = require("react");
 const react_router_1 = require("react-router");
 const messagesToRedirect = [
@@ -51,7 +50,15 @@ const getAdToken = (instance, account) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getAdToken = getAdToken;
-const useApolloClient = (uri) => {
+// jsdoc
+/**
+ *
+ * @param {ApolloClientOptions} options - The options object for the Apollo Client
+ * @param {string} options.uri - The URI of the API to be passed to Apollo Client
+ * @param {any} options.messagePopup - The message popup function, for example the 'message' function from antd
+ * @returns {ApolloClient<NormalizedCacheObject>} The Apollo Client object
+ */
+const useApolloClient = ({ uri, messagePopup }) => {
     const navigate = (0, react_router_1.useNavigate)();
     if (!uri) {
         uri = process.env.REACT_APP_API_URL;
@@ -80,7 +87,7 @@ const useApolloClient = (uri) => {
         const getClient = () => __awaiter(void 0, void 0, void 0, function* () {
             const [token, error] = yield (0, exports.getAdToken)(instance, account);
             if (error) {
-                antd_1.message.error(error.message);
+                messagePopup.error(error.message);
                 return;
             }
             const authLink = (0, context_1.setContext)((_, { headers }) => {
