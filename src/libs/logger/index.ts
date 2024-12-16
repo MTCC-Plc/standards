@@ -1,7 +1,7 @@
 import { ConsoleLogger } from "@nestjs/common";
 
 interface StandardLoggerConfig {
-  additionalContextsToIgnore: string[];
+  additionalContextsToIgnore?: string[];
 }
 
 /**
@@ -23,7 +23,7 @@ export class StandardLogger extends ConsoleLogger {
   ];
 
   constructor(config?: StandardLoggerConfig) {
-    if (config?.additionalContextsToIgnore) {
+    if (config?.additionalContextsToIgnore?.length) {
       StandardLogger.contextsToIgnore.push(
         ...config.additionalContextsToIgnore
       );

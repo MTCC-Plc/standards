@@ -1,6 +1,6 @@
 import { ConsoleLogger } from "@nestjs/common";
 interface StandardLoggerConfig {
-    additionalContextsToIgnore: string[];
+    additionalContextsToIgnore?: string[];
 }
 /**
  * A custom logger that disables all logs emitted by calling `log` method.

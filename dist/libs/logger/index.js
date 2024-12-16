@@ -14,7 +14,8 @@ const common_1 = require("@nestjs/common");
  */
 class StandardLogger extends common_1.ConsoleLogger {
     constructor(config) {
-        if (config === null || config === void 0 ? void 0 : config.additionalContextsToIgnore) {
+        var _a;
+        if ((_a = config === null || config === void 0 ? void 0 : config.additionalContextsToIgnore) === null || _a === void 0 ? void 0 : _a.length) {
             StandardLogger.contextsToIgnore.push(...config.additionalContextsToIgnore);
         }
         super();
