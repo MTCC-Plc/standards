@@ -25,6 +25,7 @@ Check the library readmes for details.
 
 - [Herald](./src/libs/herald/README.md) - Integration with the herald api.
 - [Cluster](./src/libs/cluster/README.md) - Clustering a Nestjs app.
+- [Standard Logger](./src/libs/logger/README.md) - Standard logger for a Nestjs app.
 
 ### Usage
 
