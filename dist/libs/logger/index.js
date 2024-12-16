@@ -13,9 +13,9 @@ const common_1 = require("@nestjs/common");
  * To ignore additional contexts, pass them as an array to the constructor.
  */
 class StandardLogger extends common_1.ConsoleLogger {
-    constructor(additionalContextsToIgnore) {
-        if (additionalContextsToIgnore) {
-            StandardLogger.contextsToIgnore.push(...additionalContextsToIgnore);
+    constructor(config) {
+        if (config === null || config === void 0 ? void 0 : config.additionalContextsToIgnore) {
+            StandardLogger.contextsToIgnore.push(...config.additionalContextsToIgnore);
         }
         super();
     }

@@ -1,5 +1,9 @@
 import { ConsoleLogger } from "@nestjs/common";
 
+interface StandardLoggerConfig {
+  additionalContextsToIgnore: string[];
+}
+
 /**
  * A custom logger that disables all logs emitted by calling `log` method.
  * By default ignores the following contexts:
@@ -18,9 +22,11 @@ export class StandardLogger extends ConsoleLogger {
     "NestFactory",
   ];
 
-  constructor(additionalContextsToIgnore?: string[]) {
-    if (additionalContextsToIgnore) {
-      StandardLogger.contextsToIgnore.push(...additionalContextsToIgnore);
+  constructor(config?: StandardLoggerConfig) {
+    if (config?.additionalContextsToIgnore) {
+      StandardLogger.contextsToIgnore.push(
+        ...config.additionalContextsToIgnore
+      );
     }
     super();
   }
