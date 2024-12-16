@@ -1,5 +1,6 @@
 export * from "./libs/cluster";
 export * from "./libs/herald/src";
+export * from "./libs/logger";
 export declare const DT_FORMATS: {
     short: string;
     long: string;

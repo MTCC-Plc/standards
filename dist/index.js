@@ -17,6 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isLevelGradeOrAbove = exports.isGradeOrAbove = exports.isLevelOrAbove = exports.timeDurationHumanReadable = exports.COUNTRIES = exports.DT_FORMATS = void 0;
 __exportStar(require("./libs/cluster"), exports);
 __exportStar(require("./libs/herald/src"), exports);
+__exportStar(require("./libs/logger"), exports);
 const helpers_1 = require("./helpers");
 exports.DT_FORMATS = {
     short: "DD-MMM-YY",
