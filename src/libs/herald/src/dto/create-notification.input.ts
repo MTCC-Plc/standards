@@ -36,6 +36,10 @@ export class CreateNotificationInput {
   @IsBoolean()
   @IsOptional()
   sendAllScopes?: boolean = false;
+
+  @IsBoolean()
+  @IsOptional()
+  ignoreLimit?: boolean = false;
 }
 
 export class NotificationRecipientInput {

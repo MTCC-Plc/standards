@@ -16,6 +16,7 @@ class CreateNotificationInput {
     constructor() {
         this.scopes = [];
         this.sendAllScopes = false;
+        this.ignoreLimit = false;
     }
 }
 __decorate([
@@ -52,6 +53,11 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateNotificationInput.prototype, "sendAllScopes", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateNotificationInput.prototype, "ignoreLimit", void 0);
 exports.CreateNotificationInput = CreateNotificationInput;
 class NotificationRecipientInput {
     constructor() {

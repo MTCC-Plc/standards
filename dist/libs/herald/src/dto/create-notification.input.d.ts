@@ -6,6 +6,7 @@ export declare class CreateNotificationInput {
     emailHtml?: string;
     scopes?: string[];
     sendAllScopes?: boolean;
+    ignoreLimit?: boolean;
 }
 export declare class NotificationRecipientInput {
     rcno?: number;
