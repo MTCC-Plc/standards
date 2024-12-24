@@ -1,6 +1,7 @@
 export * from "./libs/cluster";
 export * from "./libs/herald/src";
 export * from "./libs/logger";
+export * from "./libs/search/src";
 
 import { isNotNullOrUndefinedAndValidNumber } from "./helpers";
 

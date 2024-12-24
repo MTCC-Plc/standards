@@ -18,6 +18,7 @@ exports.isLevelGradeOrAbove = exports.isGradeOrAbove = exports.isLevelOrAbove = 
 __exportStar(require("./libs/cluster"), exports);
 __exportStar(require("./libs/herald/src"), exports);
 __exportStar(require("./libs/logger"), exports);
+__exportStar(require("./libs/search/src"), exports);
 const helpers_1 = require("./helpers");
 exports.DT_FORMATS = {
     short: "DD-MMM-YY",
