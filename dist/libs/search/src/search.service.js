@@ -8,9 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -23,43 +20,56 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchService = void 0;
 const common_1 = require("@nestjs/common");
-const meilisearch_1 = require("meilisearch");
-const search_decorator_1 = require("./search.decorator");
+const axios_1 = require("axios");
 let SearchService = class SearchService {
-    constructor(searchClient) {
-        this.searchClient = searchClient;
+    constructor(searchConfig) {
+        this.searchConfig = searchConfig;
     }
-    search(index, query, options) {
+    queryMeili(endpoint, method = "get", body) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.searchClient.index(index).search(query, options);
+            const headers = {
+                Authorization: `Bearer ${this.searchConfig.apiKey}`,
+                "Content-Type": "application/json",
+            };
+            const result = yield axios_1.default
+                .request({
+                url: `${this.searchConfig.host}/${endpoint}`,
+                method,
+                headers,
+                data: body,
+            })
+                .catch((err) => {
+                var _a;
+                if ((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data) {
+                    const e = err.response.data;
+                    throw new Error(`MeiliSearch-API: ${e.message}`);
+                }
+                else {
+                    throw new Error(err);
+                }
+            });
+            return result.data;
         });
     }
-    addDocuments(index, documents, options) {
+    search(index, query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.searchClient
-                .index(index)
-                .addDocuments(documents, options);
+            const res = yield this.queryMeili(`indexes/${index}/search?q=${query}`, "get");
+            return res;
         });
     }
-    getDocuments(index, parameters) {
+    deleteAll(index) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield (yield this.searchClient.getIndex(index)).getDocuments(parameters);
+            yield this.queryMeili(`indexes/${index}/documents`, "delete");
         });
     }
-    updateDocuments(index, documents) {
+    addDocuments(index, documents) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.searchClient.index(index).updateDocuments(documents);
-        });
-    }
-    deleteDocument(index, docId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.searchClient.index(index).deleteDocument(docId);
+            yield this.queryMeili(`indexes/${index}/documents`, "put", documents);
         });
     }
 };
 SearchService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, search_decorator_1.InjectSearch)()),
-    __metadata("design:paramtypes", [meilisearch_1.MeiliSearch])
+    __metadata("design:paramtypes", [Object])
 ], SearchService);
 exports.SearchService = SearchService;

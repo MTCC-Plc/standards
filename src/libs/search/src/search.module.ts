@@ -1,50 +1,39 @@
-import { DynamicModule, Global, Module, Provider } from "@nestjs/common";
-import { SEARCH_CLIENT, SEARCH_MODULE_OPTIONS } from "./constants";
+import { DynamicModule, Global, Module } from "@nestjs/common";
 import {
   SearchModuleAsyncOptions,
   SearchModuleOptions,
 } from "./search.interface";
-import {
-  createAsyncProviders,
-  createConnectionFactory,
-} from "./search.provider";
 import { SearchService } from "./search.service";
 
 @Global()
 @Module({})
 export class SearchModule {
   public static forRoot(options: SearchModuleOptions): DynamicModule {
-    const searchOptions: Provider = {
-      provide: SEARCH_MODULE_OPTIONS,
-      useValue: options,
-    };
-
-    const connectionProvider: Provider = {
-      provide: SEARCH_CLIENT,
-      useFactory: async () => await createConnectionFactory(options),
-    };
     return {
       module: SearchModule,
-      providers: [searchOptions, connectionProvider, SearchService],
-      exports: [connectionProvider, SearchService],
+      providers: [
+        {
+          provide: SearchService,
+          useValue: new SearchService(options),
+        },
+      ],
+      exports: [SearchService],
     };
   }
 
   public static forRootAsync(options: SearchModuleAsyncOptions): DynamicModule {
-    const connectionProvider: Provider = {
-      provide: SEARCH_CLIENT,
-      useFactory: async (searchOptions: SearchModuleOptions) =>
-        await createConnectionFactory(searchOptions),
-      inject: [SEARCH_MODULE_OPTIONS],
-    };
-
-    const asyncProviders = createAsyncProviders(options);
-
+    const providers = [];
+    if (options.useFactory) {
+      providers.push({
+        provide: SearchService,
+        useFactory: options.useFactory,
+      });
+    }
     return {
+      global: true,
       module: SearchModule,
-      imports: options.imports || [],
-      providers: [...asyncProviders, connectionProvider, SearchService],
-      exports: [connectionProvider, SearchService],
-    };
+      providers,
+      exports: providers,
+    } as DynamicModule;
   }
 }

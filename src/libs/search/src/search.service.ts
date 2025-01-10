@@ -1,47 +1,51 @@
 import { Injectable } from "@nestjs/common";
-import {
-  DocumentOptions,
-  DocumentsQuery,
-  EnqueuedTask,
-  MeiliSearch,
-} from "meilisearch";
-import { InjectSearch } from "./search.decorator";
+import axios from "axios";
+import { SearchModuleOptions } from "./search.interface";
 
 @Injectable()
 export class SearchService {
-  constructor(@InjectSearch() private readonly searchClient: MeiliSearch) {}
+  constructor(private readonly searchConfig: SearchModuleOptions) {}
 
-  async search(index: string, query: string, options?: any): Promise<any> {
-    return await this.searchClient.index(index).search(query, options);
+  async queryMeili<T>(
+    endpoint: string,
+    method: string = "get",
+    body?: any
+  ): Promise<T> {
+    const headers = {
+      Authorization: `Bearer ${this.searchConfig.apiKey}`,
+      "Content-Type": "application/json",
+    };
+    const result = await axios
+      .request<T>({
+        url: `${this.searchConfig.host}/${endpoint}`,
+        method,
+        headers,
+        data: body,
+      })
+      .catch((err) => {
+        if (err?.response?.data) {
+          const e = err.response.data;
+          throw new Error(`MeiliSearch-API: ${e.message}`);
+        } else {
+          throw new Error(err);
+        }
+      });
+    return result.data;
   }
 
-  async addDocuments(
-    index: string,
-    documents: Array<Record<string, any>>,
-    options?: DocumentOptions
-  ): Promise<EnqueuedTask> {
-    return await this.searchClient
-      .index(index)
-      .addDocuments(documents, options);
+  async search(index: string, query: string): Promise<any> {
+    const res = await this.queryMeili(
+      `indexes/${index}/search?q=${query}`,
+      "get"
+    );
+    return res;
   }
 
-  async getDocuments(
-    index: string,
-    parameters?: DocumentsQuery<Record<string, any>>
-  ): Promise<any> {
-    return await (
-      await this.searchClient.getIndex(index)
-    ).getDocuments(parameters);
+  async deleteAll(index: string): Promise<any> {
+    await this.queryMeili(`indexes/${index}/documents`, "delete");
   }
 
-  async updateDocuments(
-    index: string,
-    documents: Array<Partial<Record<string, any>>>
-  ): Promise<EnqueuedTask> {
-    return await this.searchClient.index(index).updateDocuments(documents);
-  }
-
-  async deleteDocument(index: string, docId: string): Promise<EnqueuedTask> {
-    return await this.searchClient.index(index).deleteDocument(docId);
+  async addDocuments(index: string, documents: any[]): Promise<any> {
+    await this.queryMeili(`indexes/${index}/documents`, "put", documents);
   }
 }
