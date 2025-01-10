@@ -7,7 +7,7 @@
     "src/core"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cd src/core && npm run build",
     "test": "jest"
   },
   "author": "Mismaah Abdulla <mismaahabdulla@gmail.com>",
