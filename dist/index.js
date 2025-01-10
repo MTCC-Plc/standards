@@ -301,7 +301,7 @@ function timeDurationHumanReadable({ minutes, hours, seconds, }) {
     }
     const hoursRounded = Math.floor(min / 60);
     minutesRounded = Math.floor(min - hoursRounded * 60);
-    return `${hoursRounded}h${minutesRounded > 0 ? ` ${minutesRounded}m` : ""}`;
+    return `${hoursRounded.toLocaleString()}h${minutesRounded > 0 ? ` ${minutesRounded}m` : ""}`;
 }
 exports.timeDurationHumanReadable = timeDurationHumanReadable;
 /**
