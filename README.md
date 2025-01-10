@@ -29,32 +29,9 @@ Check the library readmes for details.
 
 ### Usage
 
-#### Date Formats
+`standards-core` is a separate repo for splitting functionality
+of `standards` that do not have external dependencies.
+`standard-core` is a subset of `standards`, so both packages are not required.
+The idea is to use `standards-core` in front-end applications and `standards` in backend applications.
 
-To use the same date formats across all apps, use the defined formats from this library. Can be used with either moment or dayjs.
-
-```ts
-import { DT_FORMATS } from "standards";
-dayjs(comment.createdAt).format(DT_FORMATS.SHORT);
-moment(comment.createdAt).format(DT_FORMATS.SHORT);
-```
-
-#### Time Durations
-
-To display time durations in a human readable format. Enter either the total minutes, hours or seconds. Enter only one value of the three. If multiple values are entered, only one will be considered in the following order of preference: minutes, seconds, hours. If none of the values are entered, an error will be thrown.
-
-```ts
-import { timeDurationHumanReadable } from "standards";
-timeDurationHumanReadable({ seconds: 500 });
-```
-
-#### Level and Grade Check
-
-Pass in employee level_grade string to check if employee is above a certain level, grade or both.
-
-```ts
-import { isLevelOrAbove, isGradeOrAbove, isLevelGradeOrAbove } from "standards";
-isLevelOrAbove("L2G2", 2); // returns [true, 2]
-isGradeOrAbove("L2G3", 2); // returns [true, 3]
-isLevelGradeOrAbove("L5G3", 4, 6); // returns false
-```
+See documentation for [standards-core](https://github.com/MTCC-Plc/standards-core/README.md#Usage)
