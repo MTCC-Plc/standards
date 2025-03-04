@@ -53,7 +53,10 @@ let SearchService = class SearchService {
     }
     search(index, query, filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield this.queryMeili(`indexes/${index}/search?q=${query}${filter ? `&filter=${filter}` : ""}`, "get");
+            const res = yield this.queryMeili(`indexes/${index}/search`, "post", {
+                q: query,
+                filter,
+            });
             return res;
         });
     }
