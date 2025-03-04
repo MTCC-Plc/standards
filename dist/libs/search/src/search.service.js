@@ -51,9 +51,9 @@ let SearchService = class SearchService {
             return result.data;
         });
     }
-    search(index, query) {
+    search(index, query, filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield this.queryMeili(`indexes/${index}/search?q=${query}`, "get");
+            const res = yield this.queryMeili(`indexes/${index}/search?q=${query}${filter ? `&filter=${filter}` : ""}`, "get");
             return res;
         });
     }
