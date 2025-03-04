@@ -35,7 +35,9 @@ export class SearchService {
 
   async search(index: string, query: string, filter?: string): Promise<any> {
     const res = await this.queryMeili(
-      `indexes/${index}/search?q=${query}${filter ? `&filter=${filter}` : ""}`,
+      `indexes/${index}/search?q=${query}${
+        filter ? `&filter=${encodeURIComponent(filter)}` : ""
+      }`,
       "get"
     );
     return res;
