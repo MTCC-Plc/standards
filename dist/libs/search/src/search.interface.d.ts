@@ -6,3 +6,10 @@ export interface SearchModuleOptions {
 export interface SearchModuleAsyncOptions {
     useFactory?: (...args: unknown[]) => SearchModuleOptions | Promise<SearchModuleOptions>;
 }
+export interface SearchInput {
+    index: string;
+    query: string;
+    filter?: string;
+    limit?: number;
+    offset?: number;
+}

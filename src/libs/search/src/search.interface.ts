@@ -9,3 +9,11 @@ export interface SearchModuleAsyncOptions {
     ...args: unknown[]
   ) => SearchModuleOptions | Promise<SearchModuleOptions>;
 }
+
+export interface SearchInput {
+  index: string;
+  query: string;
+  filter?: string;
+  limit?: number;
+  offset?: number;
+}

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
-import { SearchModuleOptions } from "./search.interface";
+import { SearchInput, SearchModuleOptions } from "./search.interface";
 
 @Injectable()
 export class SearchService {
@@ -33,10 +33,18 @@ export class SearchService {
     return result.data;
   }
 
-  async search(index: string, query: string, filter?: string): Promise<any> {
+  async search({
+    index,
+    query,
+    filter,
+    limit,
+    offset,
+  }: SearchInput): Promise<any> {
     const res = await this.queryMeili(`indexes/${index}/search`, "post", {
       q: query,
       filter,
+      limit,
+      offset,
     });
     return res;
   }
