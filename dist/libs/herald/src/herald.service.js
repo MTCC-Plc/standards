@@ -91,7 +91,7 @@ let HeraldService = HeraldService_1 = class HeraldService {
             yield this.queryHerald("notification/sms", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined, source: this.config.source }));
         });
     }
-    sendEmail(email, message) {
+    sendEmail({ email, message, emailHtml, emailSubject }) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.config.sendNotification === "false")
                 return;
@@ -99,8 +99,10 @@ let HeraldService = HeraldService_1 = class HeraldService {
                 message,
                 recipients: [{ email }],
                 source: this.config.source,
+                emailHtml,
+                emailSubject,
             };
-            yield this.queryHerald("notification/email", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined, source: this.config.source }));
+            yield this.queryHerald("notification/email", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined }));
         });
     }
     get({ source, rcno, read, beforeId }) {

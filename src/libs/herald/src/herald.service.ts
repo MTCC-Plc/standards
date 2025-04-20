@@ -10,6 +10,7 @@ import {
   SyncNotificationInput,
 } from "./dto";
 import { CreateNotificationInput } from "./dto/create-notification.input";
+import { SendEmailInput } from "./dto/send-email.input";
 import { SyncResponse } from "./dto/sync.response";
 import { HeraldConfig } from "./herald.module";
 
@@ -85,17 +86,18 @@ export class HeraldService {
     });
   }
 
-  async sendEmail(email: string, message: string) {
+  async sendEmail({ email, message, emailHtml, emailSubject }: SendEmailInput) {
     if (this.config.sendNotification === "false") return;
     const input: CreateNotificationInput = {
       message,
       recipients: [{ email }],
       source: this.config.source,
+      emailHtml,
+      emailSubject,
     };
     await this.queryHerald("notification/email", "post", {
       ...input,
       url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined,
-      source: this.config.source,
     });
   }
 
