@@ -28,6 +28,10 @@ export class CreateNotificationInput {
   @IsOptional()
   emailHtml?: string;
 
+  @IsString()
+  @IsOptional()
+  emailSubject?: string;
+
   @IsArray()
   @IsIn(NOTIFICATION_SCOPE_NAMES, { each: true })
   @IsOptional()
