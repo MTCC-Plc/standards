@@ -4,6 +4,7 @@ export declare class CreateNotificationInput {
     message: string;
     url?: string;
     emailHtml?: string;
+    emailSubject?: string;
     scopes?: string[];
     sendAllScopes?: boolean;
     ignoreLimit?: boolean;
