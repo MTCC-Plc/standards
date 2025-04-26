@@ -46,7 +46,9 @@ export class ClusterService {
         logger.warn(
           `>> ${isPrimaryFork ? "PRIMARY " : ""}Worker [ Id: ${
             worker.id
-          } | PID: ${worker.process.pid} ] died. Restarting....`
+          } | PID: ${
+            worker.process.pid
+          } ] died, code: ${code}, signal: ${signal}. Restarting....`
         );
 
         let fork;

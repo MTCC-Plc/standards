@@ -47,7 +47,7 @@ let ClusterService = ClusterService_1 = class ClusterService {
             }
             cluster.on("exit", (worker, code, signal) => {
                 const isPrimaryFork = primaryForkId === worker.id;
-                logger.warn(`>> ${isPrimaryFork ? "PRIMARY " : ""}Worker [ Id: ${worker.id} | PID: ${worker.process.pid} ] died. Restarting....`);
+                logger.warn(`>> ${isPrimaryFork ? "PRIMARY " : ""}Worker [ Id: ${worker.id} | PID: ${worker.process.pid} ] died, code: ${code}, signal: ${signal}. Restarting....`);
                 let fork;
                 if (isPrimaryFork) {
                     fork = cluster.fork({ primaryFork: true });
