@@ -4,16 +4,12 @@
   "description": "Common standards used within MTCC",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "test": "jest"
+    "build": "tsc"
   },
   "author": "Mismaah Abdulla <mismaahabdulla@gmail.com>",
   "devDependencies": {
-    "@types/jest": "^29.5.5",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.1",
     "ts-loader": "^9.5.1",
     "typescript": "^4.9.4"
   },
