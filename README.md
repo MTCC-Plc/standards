@@ -23,9 +23,11 @@ Either the short or long hash are fine.
 Nestjs libraries can be imported.
 Check the library readmes for details.
 
-- [Herald](./src/libs/herald/README.md) - Integration with the herald api.
+- [Herald](./src/libs/herald/README.md) - Integration with the Herald API.
 - [Cluster](./src/libs/cluster/README.md) - Clustering a Nestjs app.
 - [Standard Logger](./src/libs/logger/README.md) - Standard logger for a Nestjs app.
+- [Search](./src/libs/search/README.md) - Integration with the Meilisearch API.
+- [Storage](./src/libs/storage/README.md) - Integration with the Storage Service.
 
 ### Usage
 

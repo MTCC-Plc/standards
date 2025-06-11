@@ -14,6 +14,7 @@ const graphql_1 = require("@nestjs/graphql");
 const pagination_1 = require("../../../../utils/pagination");
 let NotificationConnectionArgs = class NotificationConnectionArgs extends pagination_1.default {
 };
+exports.NotificationConnectionArgs = NotificationConnectionArgs;
 __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", Number)
@@ -38,7 +39,6 @@ __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], NotificationConnectionArgs.prototype, "url", void 0);
-NotificationConnectionArgs = __decorate([
+exports.NotificationConnectionArgs = NotificationConnectionArgs = __decorate([
     (0, graphql_1.ArgsType)()
 ], NotificationConnectionArgs);
-exports.NotificationConnectionArgs = NotificationConnectionArgs;

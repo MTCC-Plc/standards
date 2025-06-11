@@ -25,8 +25,8 @@ let SearchService = class SearchService {
     constructor(searchConfig) {
         this.searchConfig = searchConfig;
     }
-    queryMeili(endpoint, method = "get", body) {
-        return __awaiter(this, void 0, void 0, function* () {
+    queryMeili(endpoint_1) {
+        return __awaiter(this, arguments, void 0, function* (endpoint, method = "get", body) {
             const headers = {
                 Authorization: `Bearer ${this.searchConfig.apiKey}`,
                 "Content-Type": "application/json",
@@ -51,8 +51,8 @@ let SearchService = class SearchService {
             return result.data;
         });
     }
-    search({ index, query, filter, limit, offset, }) {
-        return __awaiter(this, void 0, void 0, function* () {
+    search(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ index, query, filter, limit, offset, }) {
             const res = yield this.queryMeili(`indexes/${index}/search`, "post", {
                 q: query,
                 filter,
@@ -73,8 +73,8 @@ let SearchService = class SearchService {
         });
     }
 };
-SearchService = __decorate([
+exports.SearchService = SearchService;
+exports.SearchService = SearchService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [Object])
 ], SearchService);
-exports.SearchService = SearchService;

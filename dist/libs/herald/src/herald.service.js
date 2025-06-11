@@ -27,8 +27,8 @@ let HeraldService = HeraldService_1 = class HeraldService {
         this.config = config;
         this.logger = new common_1.Logger(HeraldService_1.name);
     }
-    queryHerald(endpoint, method = "get", body, arrayBuffer = false) {
-        return __awaiter(this, void 0, void 0, function* () {
+    queryHerald(endpoint_1) {
+        return __awaiter(this, arguments, void 0, function* (endpoint, method = "get", body, arrayBuffer = false) {
             const headers = { Authorization: this.config.heraldApiKey };
             const result = yield axios_1.default
                 .request({
@@ -52,8 +52,8 @@ let HeraldService = HeraldService_1 = class HeraldService {
         });
     }
     create(input) {
-        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c;
             const source = (_a = input.source) !== null && _a !== void 0 ? _a : this.config.source;
             switch (this.config.sendNotification) {
                 case "false":
@@ -91,8 +91,8 @@ let HeraldService = HeraldService_1 = class HeraldService {
             yield this.queryHerald("notification/sms", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined, source: this.config.source }));
         });
     }
-    sendEmail({ email, message, emailHtml, emailSubject }) {
-        return __awaiter(this, void 0, void 0, function* () {
+    sendEmail(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email, message, emailHtml, emailSubject }) {
             if (this.config.sendNotification === "false")
                 return;
             const input = {
@@ -105,8 +105,8 @@ let HeraldService = HeraldService_1 = class HeraldService {
             yield this.queryHerald("notification/email", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined }));
         });
     }
-    get({ source, rcno, read, beforeId }) {
-        return __awaiter(this, void 0, void 0, function* () {
+    get(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ source, rcno, read, beforeId }) {
             let queryParams = "?";
             for (const param of [source, rcno, read, beforeId]) {
                 if (param)
@@ -135,8 +135,8 @@ let HeraldService = HeraldService_1 = class HeraldService {
         });
     }
 };
-HeraldService = HeraldService_1 = __decorate([
+exports.HeraldService = HeraldService;
+exports.HeraldService = HeraldService = HeraldService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [Object])
 ], HeraldService);
-exports.HeraldService = HeraldService;

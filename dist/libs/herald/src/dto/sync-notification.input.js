@@ -13,6 +13,7 @@ exports.SyncNotificationInput = void 0;
 const class_validator_1 = require("class-validator");
 class SyncNotificationInput {
 }
+exports.SyncNotificationInput = SyncNotificationInput;
 __decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
@@ -53,4 +54,3 @@ __decorate([
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], SyncNotificationInput.prototype, "read", void 0);
-exports.SyncNotificationInput = SyncNotificationInput;

@@ -19,6 +19,7 @@ class CreateNotificationInput {
         this.ignoreLimit = false;
     }
 }
+exports.CreateNotificationInput = CreateNotificationInput;
 __decorate([
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)(),
@@ -63,12 +64,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateNotificationInput.prototype, "ignoreLimit", void 0);
-exports.CreateNotificationInput = CreateNotificationInput;
 class NotificationRecipientInput {
     constructor() {
         this.flaggedForFetch = false;
     }
 }
+exports.NotificationRecipientInput = NotificationRecipientInput;
 __decorate([
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.IsOptional)(),
@@ -84,7 +85,6 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], NotificationRecipientInput.prototype, "phone", void 0);
-exports.NotificationRecipientInput = NotificationRecipientInput;
 class NotificationRecipientScope {
 }
 exports.NotificationRecipientScope = NotificationRecipientScope;

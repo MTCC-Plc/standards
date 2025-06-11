@@ -39,8 +39,8 @@ let SearchModule = SearchModule_1 = class SearchModule {
         };
     }
 };
-SearchModule = SearchModule_1 = __decorate([
+exports.SearchModule = SearchModule;
+exports.SearchModule = SearchModule = SearchModule_1 = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({})
 ], SearchModule);
-exports.SearchModule = SearchModule;

@@ -65,7 +65,7 @@ let ClusterService = ClusterService_1 = class ClusterService {
         }
     }
 };
-ClusterService = ClusterService_1 = __decorate([
+exports.ClusterService = ClusterService;
+exports.ClusterService = ClusterService = ClusterService_1 = __decorate([
     (0, common_1.Injectable)()
 ], ClusterService);
-exports.ClusterService = ClusterService;

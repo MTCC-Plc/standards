@@ -13,6 +13,7 @@ exports.SendEmailInput = void 0;
 const class_validator_1 = require("class-validator");
 class SendEmailInput {
 }
+exports.SendEmailInput = SendEmailInput;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -31,4 +32,3 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SendEmailInput.prototype, "emailSubject", void 0);
-exports.SendEmailInput = SendEmailInput;

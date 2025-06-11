@@ -15,6 +15,7 @@ const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 let GetNotificationInput = class GetNotificationInput {
 };
+exports.GetNotificationInput = GetNotificationInput;
 __decorate([
     (0, graphql_1.Field)(),
     (0, class_validator_1.IsString)(),
@@ -52,7 +53,6 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], GetNotificationInput.prototype, "beforeId", void 0);
-GetNotificationInput = __decorate([
+exports.GetNotificationInput = GetNotificationInput = __decorate([
     (0, graphql_1.InputType)()
 ], GetNotificationInput);
-exports.GetNotificationInput = GetNotificationInput;

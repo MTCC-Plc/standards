@@ -13,6 +13,7 @@ exports.ReadNotificationInput = void 0;
 const class_validator_1 = require("class-validator");
 class ReadNotificationInput {
 }
+exports.ReadNotificationInput = ReadNotificationInput;
 __decorate([
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
@@ -21,4 +22,3 @@ __decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
 ], ReadNotificationInput.prototype, "rcno", void 0);
-exports.ReadNotificationInput = ReadNotificationInput;
