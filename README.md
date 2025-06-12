@@ -36,4 +36,4 @@ of `standards` that do not have external dependencies.
 `standard-core` is a subset of `standards`, so both packages are not required.
 The idea is to use `standards-core` in front-end applications and `standards` in backend applications.
 
-See documentation for [standards-core](https://github.com/MTCC-Plc/standards-core/README.md#Usage)
+See documentation for [standards-core](https://github.com/MTCC-Plc/standards-core/blob/main/README.md#Usage)
