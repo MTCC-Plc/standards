@@ -16,3 +16,7 @@ export interface QueryStorageInput {
   headers?: Record<string, string>;
   responseType?: "json" | "arraybuffer" | "text";
 }
+
+export interface OcrResponse {
+  text: string;
+}

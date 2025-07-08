@@ -1,7 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import axios, { AxiosResponse } from "axios";
 import * as FormData from "form-data";
-import { QueryStorageInput, StorageModuleOptions } from "./storage.interface";
+import {
+  OcrResponse,
+  QueryStorageInput,
+  StorageModuleOptions,
+} from "./storage.interface";
 
 @Injectable()
 export class StorageService {
@@ -77,6 +81,20 @@ export class StorageService {
       responseType: "arraybuffer",
     });
     return resp;
+  }
+
+  /**
+   * @param id uuid given by the storage service
+   * @returns AxiosResponse with the file data.
+   * @description
+   * Runs ocr on the object. Throws an error if the object is not a valid image.
+   */
+  async ocr(id: string): Promise<string> {
+    const resp = await this.queryStorage<OcrResponse>({
+      endpoint: `s/${id}/ocr`,
+      method: "get",
+    });
+    return resp.data.text;
   }
 
   /**

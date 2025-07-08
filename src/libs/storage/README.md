@@ -97,3 +97,23 @@ export class AttachmentController {
   }
 }
 ```
+
+#### Run OCR on a file
+
+Example of how OCR can be run on a file. Only applicable to images. Throws an error if the object is not a valid image. Cleaning and parsing must be done on the resulting text to extract the required data.
+
+```ts
+// attachment.service.ts
+import { StorageService } from "standards";
+export class AttachmentService {
+  constructor(private storageService: StorageService) {}
+
+  @Get(":id/card-no")
+  async getIdCardNo(@Req() req, @Param() params, @Res() res) {
+    const text = await this.storageService.ocr(params.id);
+    // cleaning and parsing of the ocr text
+    const idCardNo = text.split("\n").find((l) => l.includes("A"));
+    return idCardNo;
+  }
+}
+```

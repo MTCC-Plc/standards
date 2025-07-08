@@ -22,6 +22,13 @@ export declare class StorageService {
     fetch(id: string): Promise<AxiosResponse<File, any>>;
     /**
      * @param id uuid given by the storage service
+     * @returns AxiosResponse with the file data.
+     * @description
+     * Runs ocr on the object. Throws an error if the object is not a valid image.
+     */
+    ocr(id: string): Promise<string>;
+    /**
+     * @param id uuid given by the storage service
      * @param res response object from express or nestjs given by Res decorator
      *
      * @description

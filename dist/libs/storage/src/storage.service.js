@@ -95,6 +95,21 @@ let StorageService = class StorageService {
     }
     /**
      * @param id uuid given by the storage service
+     * @returns AxiosResponse with the file data.
+     * @description
+     * Runs ocr on the object. Throws an error if the object is not a valid image.
+     */
+    ocr(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resp = yield this.queryStorage({
+                endpoint: `s/${id}/ocr`,
+                method: "get",
+            });
+            return resp.data.text;
+        });
+    }
+    /**
+     * @param id uuid given by the storage service
      * @param res response object from express or nestjs given by Res decorator
      *
      * @description
