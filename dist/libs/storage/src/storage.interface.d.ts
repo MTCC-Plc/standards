@@ -3,6 +3,8 @@ export interface StorageModuleOptions {
     appKey?: string;
 }
 export interface StorageModuleAsyncOptions {
+    imports?: any[];
+    inject?: any[];
     useFactory?: (...args: unknown[]) => StorageModuleOptions | Promise<StorageModuleOptions>;
 }
 export interface QueryStorageInput {

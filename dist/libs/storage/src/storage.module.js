@@ -29,11 +29,13 @@ let StorageModule = StorageModule_1 = class StorageModule {
             providers.push({
                 provide: storage_service_1.StorageService,
                 useFactory: options.useFactory,
+                inject: options.inject || [],
             });
         }
         return {
             global: true,
             module: StorageModule_1,
+            imports: options.imports || [],
             providers,
             exports: providers,
         };
