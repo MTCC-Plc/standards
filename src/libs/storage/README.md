@@ -18,14 +18,20 @@ import { StorageModule } from 'standards';
       appKey: process.env.STORAGE_KEY,
     }),
   ]})
-// or if using configService or something similar
+// or if using configService/settingService or something similar
 @Module({
   imports: [
     StorageModule.forRootAsync({
-      useFactory: async (configService: ConfigService) => {
+      imports: [SettingModule],
+      inject: [SettingService],
+      useFactory: async (settingService: SettingService) => {
+        const [host, appKey] = await settingService.findMany([
+          'storageUrl',
+          'storageKey',
+        ]);
         return {
-          host: configService.get('STORAGE_HOST'),
-          appKey: configService.get('STORAGE_KEY'),
+          host,
+          appKey,
         };
       },
     }),
