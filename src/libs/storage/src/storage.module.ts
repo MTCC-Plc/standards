@@ -29,11 +29,13 @@ export class StorageModule {
       providers.push({
         provide: StorageService,
         useFactory: options.useFactory,
+        inject: options.inject || [],
       });
     }
     return {
       global: true,
       module: StorageModule,
+      imports: options.imports || [],
       providers,
       exports: providers,
     } as DynamicModule;

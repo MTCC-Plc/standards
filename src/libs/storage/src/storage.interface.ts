@@ -4,6 +4,8 @@ export interface StorageModuleOptions {
 }
 
 export interface StorageModuleAsyncOptions {
+  imports?: any[];
+  inject?: any[];
   useFactory?: (
     ...args: unknown[]
   ) => StorageModuleOptions | Promise<StorageModuleOptions>;
