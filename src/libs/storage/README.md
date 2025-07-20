@@ -64,12 +64,12 @@ export class AttachmentController {
     @Body() body: CreateAttachmentInput
   ) {
     // check user access, file type checks, etc
-    const objectId = await this.storageService.upload(file);
+    const object = await this.storageService.upload(file);
     try {
       // db stuff, notifications, etc
       // store objectId in the app's db here
     } catch (e) {
-      await this.storageService.delete(objectId);
+      await this.storageService.delete(object.id);
       throw e;
     }
   }
