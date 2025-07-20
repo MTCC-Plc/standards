@@ -6,10 +6,10 @@ export declare class StorageService {
     queryStorage<T>({ endpoint, method, body, headers, responseType, }: QueryStorageInput): Promise<AxiosResponse<T, any>>;
     /**
      * @param file Express.Multer.File object.
-     * @returns the uuid of the uploaded file from the storage service.
+     * @returns the uploaded storage object from the storage service.
      * @description
      * Uploads a file to the storage service. The file should be an
-     * Express.Multer.File object, which is typically
+     * Express.Multer.File object.
      */
     upload(file: Express.Multer.File): Promise<StorageObject>;
     /**

@@ -52,10 +52,10 @@ let StorageService = class StorageService {
     }
     /**
      * @param file Express.Multer.File object.
-     * @returns the uuid of the uploaded file from the storage service.
+     * @returns the uploaded storage object from the storage service.
      * @description
      * Uploads a file to the storage service. The file should be an
-     * Express.Multer.File object, which is typically
+     * Express.Multer.File object.
      */
     upload(file) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -28,7 +28,10 @@ export class StorageModule {
     if (options.useFactory) {
       providers.push({
         provide: StorageService,
-        useFactory: options.useFactory,
+        useFactory: async (...args: any[]) => {
+          const config = await options.useFactory!(...args);
+          return new StorageService(config);
+        },
         inject: options.inject || [],
       });
     }
