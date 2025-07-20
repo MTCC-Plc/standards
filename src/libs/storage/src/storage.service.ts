@@ -5,6 +5,7 @@ import {
   OcrResponse,
   QueryStorageInput,
   StorageModuleOptions,
+  StorageObject,
 } from "./storage.interface";
 
 @Injectable()
@@ -44,19 +45,19 @@ export class StorageService {
 
   /**
    * @param file Express.Multer.File object.
-   * @returns the uuid of the uploaded file from the storage service.
+   * @returns the uploaded storage object from the storage service.
    * @description
    * Uploads a file to the storage service. The file should be an
-   * Express.Multer.File object, which is typically
+   * Express.Multer.File object.
    */
-  async upload(file: Express.Multer.File): Promise<string> {
+  async upload(file: Express.Multer.File): Promise<StorageObject> {
     const formData = new FormData();
     formData.append("file", file.buffer, {
       filename: file.originalname,
       contentType: file.mimetype,
       knownLength: file.size,
     });
-    const resp = await this.queryStorage<string>({
+    const resp = await this.queryStorage<StorageObject>({
       endpoint: "s",
       method: "post",
       body: formData,

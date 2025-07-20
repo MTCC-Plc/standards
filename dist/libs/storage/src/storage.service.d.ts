@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { QueryStorageInput, StorageModuleOptions } from "./storage.interface";
+import { QueryStorageInput, StorageModuleOptions, StorageObject } from "./storage.interface";
 export declare class StorageService {
     private readonly config;
     constructor(config: StorageModuleOptions);
@@ -11,7 +11,7 @@ export declare class StorageService {
      * Uploads a file to the storage service. The file should be an
      * Express.Multer.File object, which is typically
      */
-    upload(file: Express.Multer.File): Promise<string>;
+    upload(file: Express.Multer.File): Promise<StorageObject>;
     /**
      * @param id uuid given by the storage service
      * @returns AxiosResponse with the file data.

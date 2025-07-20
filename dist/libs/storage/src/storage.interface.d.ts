@@ -17,3 +17,11 @@ export interface QueryStorageInput {
 export interface OcrResponse {
     text: string;
 }
+export interface StorageObject {
+    id: string;
+    createdAt: string;
+    originalName: string;
+    appId: number;
+    mimeType: string;
+    sizeBytes: number;
+}
