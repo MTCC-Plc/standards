@@ -1,4 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import axios, { AxiosResponse } from "axios";
 import * as FormData from "form-data";
 import {
@@ -33,11 +41,40 @@ export class StorageService {
         responseType,
       })
       .catch((err) => {
-        if (err?.response?.data) {
-          const e = err.response.data;
-          throw new Error(`Storage Service: ${e.message}`);
+        if (err.response) {
+          const { status, data } = err.response;
+          const errorMessage =
+            data?.error || data?.message || `Storage Service Error`;
+
+          switch (status) {
+            case 400:
+              throw new BadRequestException(`Storage Service: ${errorMessage}`);
+            case 401:
+              throw new UnauthorizedException(
+                `Storage Service: ${errorMessage}`
+              );
+            case 403:
+              throw new ForbiddenException(`Storage Service: ${errorMessage}`);
+            case 404:
+              throw new NotFoundException(`Storage Service: ${errorMessage}`);
+            case 500:
+            case 502:
+            case 503:
+            case 504:
+              throw new InternalServerErrorException(
+                `Storage Service: ${errorMessage}`
+              );
+            default:
+              throw new HttpException(
+                `Storage Service: ${errorMessage}`,
+                status
+              );
+          }
         } else {
-          throw new Error(err);
+          // Network error or other non-HTTP error
+          throw new InternalServerErrorException(
+            `Storage Service: ${err.message || "Network error"}`
+          );
         }
       });
     return result;

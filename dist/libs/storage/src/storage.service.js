@@ -38,13 +38,30 @@ let StorageService = class StorageService {
                 responseType,
             })
                 .catch((err) => {
-                var _a;
-                if ((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data) {
-                    const e = err.response.data;
-                    throw new Error(`Storage Service: ${e.message}`);
+                if (err.response) {
+                    const { status, data } = err.response;
+                    const errorMessage = (data === null || data === void 0 ? void 0 : data.error) || (data === null || data === void 0 ? void 0 : data.message) || `Storage Service Error`;
+                    switch (status) {
+                        case 400:
+                            throw new common_1.BadRequestException(`Storage Service: ${errorMessage}`);
+                        case 401:
+                            throw new common_1.UnauthorizedException(`Storage Service: ${errorMessage}`);
+                        case 403:
+                            throw new common_1.ForbiddenException(`Storage Service: ${errorMessage}`);
+                        case 404:
+                            throw new common_1.NotFoundException(`Storage Service: ${errorMessage}`);
+                        case 500:
+                        case 502:
+                        case 503:
+                        case 504:
+                            throw new common_1.InternalServerErrorException(`Storage Service: ${errorMessage}`);
+                        default:
+                            throw new common_1.HttpException(`Storage Service: ${errorMessage}`, status);
+                    }
                 }
                 else {
-                    throw new Error(err);
+                    // Network error or other non-HTTP error
+                    throw new common_1.InternalServerErrorException(`Storage Service: ${err.message || "Network error"}`);
                 }
             });
             return result;
