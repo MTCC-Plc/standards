@@ -63,10 +63,12 @@ let HeraldService = HeraldService_1 = class HeraldService {
                 case "":
                     break;
                 default:
-                    const rcnos = this.config.sendNotification.split(",");
+                    const identifiers = this.config.sendNotification.split(",");
                     const allowedRecipients = [];
                     for (const i of input.recipients) {
-                        if (rcnos.includes(`${i.rcno}`)) {
+                        if (identifiers.includes(`${i.rcno}`) ||
+                            identifiers.includes(`${i.email}`) ||
+                            identifiers.includes(`${i.phone}`)) {
                             allowedRecipients.push(i);
                         }
                     }

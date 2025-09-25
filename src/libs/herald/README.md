@@ -41,7 +41,7 @@ import { HeraldModule } from 'standards';
 - `heraldApiKey` API key for herald API
 - `source` Source of the notifications to be generated or fetched i.e. the name of the app using this service
 - `sourceBaseUrl` Base url of the source frontend
-- `sendNotification` Meant to be used in development. If false is passed, notifications will not be created. If a list of rcnos are passed, will only create notifications for those employees. In production, this can be either be undefined, empty string or 'true'.
+- `sendNotification` Meant to be used in development. If false is passed, notifications will not be created. If a list of rcnos, emails or phone numbers are passed, will only create notifications for recipients having those rcnos, emails or phone numbers. In production, this can be either be undefined, empty string or 'true'.
 
 Use `HeraldService` in your services that create notifications.
 Check [Herald API usage](https://github.com/MTCC-Plc/herald-api?tab=readme-ov-file#usage) for details of all the individual functions. There is a equivalent function in this service for every herald endpoint.
