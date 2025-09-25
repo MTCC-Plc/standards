@@ -46,7 +46,13 @@ export class HeraldModule {
     if (options.useFactory) {
       providers.push({
         provide: HeraldService,
-        useFactory: options.useFactory,
+        useFactory: async (...args: unknown[]) => {
+          if (!options.useFactory) {
+            throw new Error("useFactory is required");
+          }
+          const config = await options.useFactory(...args);
+          return new HeraldService(config);
+        },
         inject: options.inject || [],
       });
     }
