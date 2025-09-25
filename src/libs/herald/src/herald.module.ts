@@ -21,6 +21,8 @@ export interface HeraldConfig {
 }
 
 export interface HeraldModuleAsyncOptions {
+  imports?: any[];
+  inject?: any[];
   useFactory?: (...args: unknown[]) => HeraldConfig | Promise<HeraldConfig>;
 }
 
@@ -45,11 +47,13 @@ export class HeraldModule {
       providers.push({
         provide: HeraldService,
         useFactory: options.useFactory,
+        inject: options.inject || [],
       });
     }
     return {
       global: true,
       module: HeraldModule,
+      imports: options.imports || [],
       providers,
       exports: providers,
     } as DynamicModule;

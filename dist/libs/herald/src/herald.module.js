@@ -27,11 +27,13 @@ let HeraldModule = HeraldModule_1 = class HeraldModule {
             providers.push({
                 provide: herald_service_1.HeraldService,
                 useFactory: options.useFactory,
+                inject: options.inject || [],
             });
         }
         return {
             global: true,
             module: HeraldModule_1,
+            imports: options.imports || [],
             providers,
             exports: providers,
         };

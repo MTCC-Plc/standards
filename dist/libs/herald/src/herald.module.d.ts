@@ -19,6 +19,8 @@ export interface HeraldConfig {
     sendNotification?: string;
 }
 export interface HeraldModuleAsyncOptions {
+    imports?: any[];
+    inject?: any[];
     useFactory?: (...args: unknown[]) => HeraldConfig | Promise<HeraldConfig>;
 }
 export declare class HeraldModule {
