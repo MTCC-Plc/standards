@@ -25,7 +25,7 @@ export class SearchService {
       .catch((err) => {
         if (err?.response?.data) {
           const e = err.response.data;
-          throw new Error(`MeiliSearch-API: ${e.message}`);
+          throw new Error(`MeiliSearch-API: ${e.message ? e.message : e}`);
         } else {
           throw new Error(err);
         }

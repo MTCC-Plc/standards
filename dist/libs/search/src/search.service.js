@@ -42,7 +42,7 @@ let SearchService = class SearchService {
                 var _a;
                 if ((_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.data) {
                     const e = err.response.data;
-                    throw new Error(`MeiliSearch-API: ${e.message}`);
+                    throw new Error(`MeiliSearch-API: ${e.message ? e.message : e}`);
                 }
                 else {
                     throw new Error(err);
