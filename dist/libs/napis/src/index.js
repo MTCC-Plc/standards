@@ -14,10 +14,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("standards-core"), exports);
-__exportStar(require("./libs/cluster"), exports);
-__exportStar(require("./libs/herald/src"), exports);
-__exportStar(require("./libs/logger"), exports);
-__exportStar(require("./libs/napis/src"), exports);
-__exportStar(require("./libs/search/src"), exports);
-__exportStar(require("./libs/storage/src"), exports);
+__exportStar(require("./napis.interface"), exports);
+__exportStar(require("./napis.module"), exports);
+__exportStar(require("./napis.service"), exports);
