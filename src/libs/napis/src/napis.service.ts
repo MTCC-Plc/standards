@@ -108,6 +108,18 @@ export class NapisService {
    * }
    */
   async isPwd(nid: string): Promise<IsPwdResponse> {
+    if (this.config.mock) {
+      const lastNumber = parseInt(nid.slice(-1), 10);
+      if (lastNumber && lastNumber % 2 === 0) {
+        return {
+          isPwd: true,
+          type: "Visual Impairment",
+        };
+      }
+      return {
+        isPwd: false,
+      };
+    }
     const resp = await this.queryNapis<IsPwdResponse>({
       endpoint: `nspa/pwd?nid=${nid}`,
       method: "get",

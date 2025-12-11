@@ -102,6 +102,18 @@ let NapisService = class NapisService {
      */
     isPwd(nid) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (this.config.mock) {
+                const lastNumber = parseInt(nid.slice(-1), 10);
+                if (lastNumber && lastNumber % 2 === 0) {
+                    return {
+                        isPwd: true,
+                        type: "Visual Impairment",
+                    };
+                }
+                return {
+                    isPwd: false,
+                };
+            }
             const resp = yield this.queryNapis({
                 endpoint: `nspa/pwd?nid=${nid}`,
                 method: "get",

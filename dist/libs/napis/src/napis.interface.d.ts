@@ -6,6 +6,8 @@ export interface NapisModuleOptions {
     host: string;
     /** Optional API key for authentication */
     appKey?: string;
+    /** Enable mock mode for testing purposes */
+    mock?: boolean;
 }
 /**
  * Async configuration options for NapisModule using factory pattern.
