@@ -37,7 +37,7 @@ export class ClusterService {
         logger.verbose(
           `${isPrimaryFork ? "PRIMARY " : ""}Worker [ Id: ${worker.id} | PID: ${
             worker.process.pid
-          } ] started.`
+          } ] started.`,
         );
       }
 
@@ -48,22 +48,27 @@ export class ClusterService {
             worker.id
           } | PID: ${
             worker.process.pid
-          } ] died, code: ${code}, signal: ${signal}. Restarting....`
+          } ] died, code: ${code}, signal: ${signal}. Restarting....`,
         );
 
-        let fork;
-        if (isPrimaryFork) {
-          fork = cluster.fork({ primaryFork: true });
-          primaryForkId = fork.id;
-        } else {
-          fork = cluster.fork();
-        }
-
-        logger.verbose(
-          `>> ${isPrimaryFork ? "PRIMARY " : ""}Worker [ Id: ${
-            fork.id
-          } | PID: ${fork.process.pid} ] restarted.`
-        );
+        setTimeout(() => {
+          try {
+            let fork;
+            if (isPrimaryFork) {
+              fork = cluster.fork({ primaryFork: true });
+              primaryForkId = fork.id;
+            } else {
+              fork = cluster.fork();
+            }
+            logger.verbose(
+              `>> ${isPrimaryFork ? "PRIMARY " : ""}Worker [ Id: ${
+                fork.id
+              } | PID: ${fork.process.pid} ] restarted.`,
+            );
+          } catch (error) {
+            logger.error(`Failed to fork worker: ${error}`);
+          }
+        }, 1000);
       });
     } else {
       logger.verbose(`Cluster server started on ${process.pid}`);
