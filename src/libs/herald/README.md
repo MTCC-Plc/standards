@@ -60,3 +60,43 @@ export class RandomService {
   }
 }
 ```
+
+### Sending emails with attachments
+
+Use `sendEmailWithAttachments()` for the dedicated attachment endpoint. This sends the email directly through Herald using `multipart/form-data`, while the regular `sendEmail()` method remains unchanged.
+
+```ts
+import { HeraldService } from "standards";
+import { readFile } from "node:fs/promises";
+
+export class RandomService {
+  constructor(private heraldService: HeraldService) {}
+
+  async sendReport() {
+    const report = await readFile("./report.pdf");
+
+    await this.heraldService.sendEmailWithAttachments({
+      message: "Please find the attached report.",
+      recipients: [{ email: "ahmed@gmail.com" }],
+      emailSubject: "Monthly report",
+      attachments: [
+        {
+          filename: "report.pdf",
+          content: report,
+          contentType: "application/pdf",
+        },
+      ],
+    });
+  }
+}
+```
+
+`sendEmailWithAttachments()` accepts:
+
+- `recipients`: array of Herald email recipients. Each recipient must include `email`.
+- `message`: email body text.
+- `source`: optional source override. Defaults to the module source.
+- `url`: optional frontend URL path or absolute path segment, prefixed with `sourceBaseUrl`.
+- `emailHtml`: optional custom HTML body.
+- `emailSubject`: optional email subject.
+- `attachments`: array of files with `filename`, `content` as a `Buffer`, and optional `contentType`.

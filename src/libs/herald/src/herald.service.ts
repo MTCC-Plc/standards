@@ -10,9 +10,11 @@ import {
   SyncNotificationInput,
 } from "./dto";
 import { CreateNotificationInput } from "./dto/create-notification.input";
+import { SendEmailWithAttachmentsInput } from "./dto/send-email-with-attachments.input";
 import { SendEmailInput } from "./dto/send-email.input";
 import { SyncResponse } from "./dto/sync.response";
 import { HeraldConfig } from "./herald.module";
+import FormData = require("form-data");
 
 @Injectable()
 export class HeraldService {
@@ -22,14 +24,18 @@ export class HeraldService {
     endpoint: string,
     method: Method = "get",
     body?: any,
-    arrayBuffer: boolean = false
+    arrayBuffer: boolean = false,
+    headers?: Record<string, string>,
   ): Promise<T> {
-    const headers = { Authorization: this.config.heraldApiKey };
+    const requestHeaders = {
+      Authorization: this.config.heraldApiKey,
+      ...headers,
+    };
     const result = await axios
       .request({
         url: `${this.config.heraldApiUrl}/${endpoint}`,
         method,
-        headers,
+        headers: requestHeaders,
         data: body,
         responseType: arrayBuffer ? "arraybuffer" : undefined,
       })
@@ -105,6 +111,46 @@ export class HeraldService {
     });
   }
 
+  async sendEmailWithAttachments({
+    recipients,
+    message,
+    source,
+    url,
+    emailHtml,
+    emailSubject,
+    attachments,
+  }: SendEmailWithAttachmentsInput) {
+    if (this.config.sendNotification === "false") return;
+
+    const formData = new FormData();
+    formData.append("message", message);
+    formData.append("recipients", JSON.stringify(recipients));
+    formData.append("source", source ?? this.config.source);
+    if (url) {
+      formData.append("url", `${this.config.sourceBaseUrl ?? ""}${url}`);
+    }
+    if (emailHtml) {
+      formData.append("emailHtml", emailHtml);
+    }
+    if (emailSubject) {
+      formData.append("emailSubject", emailSubject);
+    }
+    for (const attachment of attachments) {
+      formData.append("attachments", attachment.content, {
+        filename: attachment.filename,
+        contentType: attachment.contentType,
+      });
+    }
+
+    await this.queryHerald(
+      "notification/email-with-attachments",
+      "post",
+      formData,
+      false,
+      formData.getHeaders() as Record<string, string>,
+    );
+  }
+
   async get({ source, rcno, read, beforeId }: GetNotificationInput) {
     let queryParams = "?";
     for (const param of [source, rcno, read, beforeId]) {
@@ -122,17 +168,17 @@ export class HeraldService {
   }
 
   async syncLegacyNotifications(
-    inputs: SyncNotificationInput[]
+    inputs: SyncNotificationInput[],
   ): Promise<SyncResponse[]> {
     if (inputs.length > 1000) {
       this.logger.warn(
-        "Syncing many notifications at once could cause crashes due to lack of memory. It is recommended to sync 1000 or less at a time."
+        "Syncing many notifications at once could cause crashes due to lack of memory. It is recommended to sync 1000 or less at a time.",
       );
     }
     const results = await this.queryHerald<SyncResponse[]>(
       "notification/sync",
       "post",
-      inputs
+      inputs,
     );
     return results;
   }

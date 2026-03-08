@@ -22,19 +22,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HeraldService = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("axios");
+const FormData = require("form-data");
 let HeraldService = HeraldService_1 = class HeraldService {
     constructor(config) {
         this.config = config;
         this.logger = new common_1.Logger(HeraldService_1.name);
     }
     queryHerald(endpoint_1) {
-        return __awaiter(this, arguments, void 0, function* (endpoint, method = "get", body, arrayBuffer = false) {
-            const headers = { Authorization: this.config.heraldApiKey };
+        return __awaiter(this, arguments, void 0, function* (endpoint, method = "get", body, arrayBuffer = false, headers) {
+            const requestHeaders = Object.assign({ Authorization: this.config.heraldApiKey }, headers);
             const result = yield axios_1.default
                 .request({
                 url: `${this.config.heraldApiUrl}/${endpoint}`,
                 method,
-                headers,
+                headers: requestHeaders,
                 data: body,
                 responseType: arrayBuffer ? "arraybuffer" : undefined,
             })
@@ -105,6 +106,33 @@ let HeraldService = HeraldService_1 = class HeraldService {
                 emailSubject,
             };
             yield this.queryHerald("notification/email", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined }));
+        });
+    }
+    sendEmailWithAttachments(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ recipients, message, source, url, emailHtml, emailSubject, attachments, }) {
+            var _b;
+            if (this.config.sendNotification === "false")
+                return;
+            const formData = new FormData();
+            formData.append("message", message);
+            formData.append("recipients", JSON.stringify(recipients));
+            formData.append("source", source !== null && source !== void 0 ? source : this.config.source);
+            if (url) {
+                formData.append("url", `${(_b = this.config.sourceBaseUrl) !== null && _b !== void 0 ? _b : ""}${url}`);
+            }
+            if (emailHtml) {
+                formData.append("emailHtml", emailHtml);
+            }
+            if (emailSubject) {
+                formData.append("emailSubject", emailSubject);
+            }
+            for (const attachment of attachments) {
+                formData.append("attachments", attachment.content, {
+                    filename: attachment.filename,
+                    contentType: attachment.contentType,
+                });
+            }
+            yield this.queryHerald("notification/email-with-attachments", "post", formData, false, formData.getHeaders());
         });
     }
     get(_a) {
