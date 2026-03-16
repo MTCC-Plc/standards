@@ -12,6 +12,7 @@ import * as FormData from "form-data";
 import {
   OcrResponse,
   QueryStorageInput,
+  StorageFetchOptions,
   StorageModuleOptions,
   StorageObject,
 } from "./storage.interface";
@@ -19,6 +20,23 @@ import {
 @Injectable()
 export class StorageService {
   constructor(private readonly config: StorageModuleOptions) {}
+
+  private buildObjectEndpoint(id: string, options?: StorageFetchOptions) {
+    const params = new URLSearchParams();
+
+    if (options?.original) {
+      params.set("original", "true");
+    }
+    if (options?.lossy) {
+      params.set("lossy", "true");
+    }
+    if (options?.quality !== undefined) {
+      params.set("quality", `${options.quality}`);
+    }
+
+    const query = params.toString();
+    return query ? `s/${id}?${query}` : `s/${id}`;
+  }
 
   async queryStorage<T>({
     endpoint,
@@ -51,7 +69,7 @@ export class StorageService {
               throw new BadRequestException(`Storage Service: ${errorMessage}`);
             case 401:
               throw new UnauthorizedException(
-                `Storage Service: ${errorMessage}`
+                `Storage Service: ${errorMessage}`,
               );
             case 403:
               throw new ForbiddenException(`Storage Service: ${errorMessage}`);
@@ -62,18 +80,18 @@ export class StorageService {
             case 503:
             case 504:
               throw new InternalServerErrorException(
-                `Storage Service: ${errorMessage}`
+                `Storage Service: ${errorMessage}`,
               );
             default:
               throw new HttpException(
                 `Storage Service: ${errorMessage}`,
-                status
+                status,
               );
           }
         } else {
           // Network error or other non-HTTP error
           throw new InternalServerErrorException(
-            `Storage Service: ${err.message || "Network error"}`
+            `Storage Service: ${err.message || "Network error"}`,
           );
         }
       });
@@ -107,14 +125,23 @@ export class StorageService {
 
   /**
    * @param id uuid given by the storage service
+   * @param options optional transformation controls for image responses
    * @returns AxiosResponse with the file data.
    * @description
    * Fetches a file from the storage service by its ID. Recommended to use
    * the serve method instead, which is meant to be used with the Res decorator.
+   *
+   * Supported options:
+   * - `original: true` serves the original stored object without WebP conversion.
+   * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
+   * - `quality` sets WebP quality for lossy responses. Default is 80.
    */
-  async fetch(id: string): Promise<AxiosResponse<File, any>> {
+  async fetch(
+    id: string,
+    options?: StorageFetchOptions,
+  ): Promise<AxiosResponse<File, any>> {
     const resp = await this.queryStorage<File>({
-      endpoint: `s/${id}`,
+      endpoint: this.buildObjectEndpoint(id, options),
       method: "get",
       responseType: "arraybuffer",
     });
@@ -138,14 +165,20 @@ export class StorageService {
   /**
    * @param id uuid given by the storage service
    * @param res response object from express or nestjs given by Res decorator
+   * @param options optional transformation controls for image responses
    *
    * @description
    * Serves a file from the storage service. Meant to be used at the end of the
    * controller method, where you can use the Res decorator.
+   *
+   * Supported options:
+   * - `original: true` serves the original stored object without WebP conversion.
+   * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
+   * - `quality` sets WebP quality for lossy responses. Default is 80.
    */
-  async serve(id: string, res: any) {
+  async serve(id: string, res: any, options?: StorageFetchOptions) {
     const resp = await this.queryStorage<string>({
-      endpoint: `s/${id}`,
+      endpoint: this.buildObjectEndpoint(id, options),
       method: "get",
       responseType: "arraybuffer",
     });

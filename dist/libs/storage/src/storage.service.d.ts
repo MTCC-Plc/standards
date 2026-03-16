@@ -1,8 +1,9 @@
 import { AxiosResponse } from "axios";
-import { QueryStorageInput, StorageModuleOptions, StorageObject } from "./storage.interface";
+import { QueryStorageInput, StorageFetchOptions, StorageModuleOptions, StorageObject } from "./storage.interface";
 export declare class StorageService {
     private readonly config;
     constructor(config: StorageModuleOptions);
+    private buildObjectEndpoint;
     queryStorage<T>({ endpoint, method, body, headers, responseType, }: QueryStorageInput): Promise<AxiosResponse<T, any>>;
     /**
      * @param file Express.Multer.File object.
@@ -14,12 +15,18 @@ export declare class StorageService {
     upload(file: Express.Multer.File): Promise<StorageObject>;
     /**
      * @param id uuid given by the storage service
+     * @param options optional transformation controls for image responses
      * @returns AxiosResponse with the file data.
      * @description
      * Fetches a file from the storage service by its ID. Recommended to use
      * the serve method instead, which is meant to be used with the Res decorator.
+     *
+     * Supported options:
+     * - `original: true` serves the original stored object without WebP conversion.
+     * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
+     * - `quality` sets WebP quality for lossy responses. Default is 80.
      */
-    fetch(id: string): Promise<AxiosResponse<File, any>>;
+    fetch(id: string, options?: StorageFetchOptions): Promise<AxiosResponse<File, any>>;
     /**
      * @param id uuid given by the storage service
      * @returns AxiosResponse with the file data.
@@ -30,12 +37,18 @@ export declare class StorageService {
     /**
      * @param id uuid given by the storage service
      * @param res response object from express or nestjs given by Res decorator
+     * @param options optional transformation controls for image responses
      *
      * @description
      * Serves a file from the storage service. Meant to be used at the end of the
      * controller method, where you can use the Res decorator.
+     *
+     * Supported options:
+     * - `original: true` serves the original stored object without WebP conversion.
+     * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
+     * - `quality` sets WebP quality for lossy responses. Default is 80.
      */
-    serve(id: string, res: any): Promise<void>;
+    serve(id: string, res: any, options?: StorageFetchOptions): Promise<void>;
     /**
      * @param id uuid given by the storage service
      *

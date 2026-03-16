@@ -26,6 +26,20 @@ let StorageService = class StorageService {
     constructor(config) {
         this.config = config;
     }
+    buildObjectEndpoint(id, options) {
+        const params = new URLSearchParams();
+        if (options === null || options === void 0 ? void 0 : options.original) {
+            params.set("original", "true");
+        }
+        if (options === null || options === void 0 ? void 0 : options.lossy) {
+            params.set("lossy", "true");
+        }
+        if ((options === null || options === void 0 ? void 0 : options.quality) !== undefined) {
+            params.set("quality", `${options.quality}`);
+        }
+        const query = params.toString();
+        return query ? `s/${id}?${query}` : `s/${id}`;
+    }
     queryStorage(_a) {
         return __awaiter(this, arguments, void 0, function* ({ endpoint, method, body, headers, responseType = undefined, }) {
             const h = Object.assign({ Authorization: `${this.config.appKey}`, "Content-Type": "application/json" }, headers);
@@ -95,15 +109,21 @@ let StorageService = class StorageService {
     }
     /**
      * @param id uuid given by the storage service
+     * @param options optional transformation controls for image responses
      * @returns AxiosResponse with the file data.
      * @description
      * Fetches a file from the storage service by its ID. Recommended to use
      * the serve method instead, which is meant to be used with the Res decorator.
+     *
+     * Supported options:
+     * - `original: true` serves the original stored object without WebP conversion.
+     * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
+     * - `quality` sets WebP quality for lossy responses. Default is 80.
      */
-    fetch(id) {
+    fetch(id, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.queryStorage({
-                endpoint: `s/${id}`,
+                endpoint: this.buildObjectEndpoint(id, options),
                 method: "get",
                 responseType: "arraybuffer",
             });
@@ -128,16 +148,22 @@ let StorageService = class StorageService {
     /**
      * @param id uuid given by the storage service
      * @param res response object from express or nestjs given by Res decorator
+     * @param options optional transformation controls for image responses
      *
      * @description
      * Serves a file from the storage service. Meant to be used at the end of the
      * controller method, where you can use the Res decorator.
+     *
+     * Supported options:
+     * - `original: true` serves the original stored object without WebP conversion.
+     * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
+     * - `quality` sets WebP quality for lossy responses. Default is 80.
      */
-    serve(id, res) {
+    serve(id, res, options) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c, _d;
             const resp = yield this.queryStorage({
-                endpoint: `s/${id}`,
+                endpoint: this.buildObjectEndpoint(id, options),
                 method: "get",
                 responseType: "arraybuffer",
             });

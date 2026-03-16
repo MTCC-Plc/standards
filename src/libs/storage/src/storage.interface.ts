@@ -19,6 +19,12 @@ export interface QueryStorageInput {
   responseType?: "json" | "arraybuffer" | "text";
 }
 
+export interface StorageFetchOptions {
+  original?: boolean;
+  lossy?: boolean;
+  quality?: number;
+}
+
 export interface OcrResponse {
   text: string;
 }
