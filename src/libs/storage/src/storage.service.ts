@@ -15,6 +15,7 @@ import {
   StorageFetchOptions,
   StorageModuleOptions,
   StorageObject,
+  UploadOptions,
 } from "./storage.interface";
 
 @Injectable()
@@ -100,18 +101,33 @@ export class StorageService {
 
   /**
    * @param file Express.Multer.File object.
+   * @param options optional OCR options to run during upload.
    * @returns the uploaded storage object from the storage service.
    * @description
    * Uploads a file to the storage service. The file should be an
    * Express.Multer.File object.
+   *
+   * Supported options:
+   * - `ocr: true` runs plain text OCR on the file after upload.
+   * - `ocrFields` runs structured field extraction. Pass a map of field names to descriptions.
+   *
+   * When OCR options are provided, the result is returned in `ocrResult`.
    */
-  async upload(file: Express.Multer.File): Promise<StorageObject> {
+  async upload(
+    file: Express.Multer.File,
+    options?: UploadOptions,
+  ): Promise<StorageObject> {
     const formData = new FormData();
     formData.append("file", file.buffer, {
       filename: file.originalname,
       contentType: file.mimetype,
       knownLength: file.size,
     });
+    if (options?.ocrFields) {
+      formData.append("ocrFields", JSON.stringify(options.ocrFields));
+    } else if (options?.ocr) {
+      formData.append("ocr", "true");
+    }
     const resp = await this.queryStorage<StorageObject>({
       endpoint: "s",
       method: "post",

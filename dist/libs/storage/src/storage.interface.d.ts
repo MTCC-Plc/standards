@@ -29,4 +29,11 @@ export interface StorageObject {
     appId: number;
     mimeType: string;
     sizeBytes: number;
+    ocrResult?: string | Record<string, string>;
+}
+export interface UploadOptions {
+    /** Run plain text OCR on the uploaded file */
+    ocr?: boolean;
+    /** Run structured field extraction OCR. Keys are field names, values are descriptions. */
+    ocrFields?: Record<string, string>;
 }

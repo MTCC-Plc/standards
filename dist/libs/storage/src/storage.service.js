@@ -83,12 +83,19 @@ let StorageService = class StorageService {
     }
     /**
      * @param file Express.Multer.File object.
+     * @param options optional OCR options to run during upload.
      * @returns the uploaded storage object from the storage service.
      * @description
      * Uploads a file to the storage service. The file should be an
      * Express.Multer.File object.
+     *
+     * Supported options:
+     * - `ocr: true` runs plain text OCR on the file after upload.
+     * - `ocrFields` runs structured field extraction. Pass a map of field names to descriptions.
+     *
+     * When OCR options are provided, the result is returned in `ocrResult`.
      */
-    upload(file) {
+    upload(file, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const formData = new FormData();
             formData.append("file", file.buffer, {
@@ -96,6 +103,12 @@ let StorageService = class StorageService {
                 contentType: file.mimetype,
                 knownLength: file.size,
             });
+            if (options === null || options === void 0 ? void 0 : options.ocrFields) {
+                formData.append("ocrFields", JSON.stringify(options.ocrFields));
+            }
+            else if (options === null || options === void 0 ? void 0 : options.ocr) {
+                formData.append("ocr", "true");
+            }
             const resp = yield this.queryStorage({
                 endpoint: "s",
                 method: "post",

@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { QueryStorageInput, StorageFetchOptions, StorageModuleOptions, StorageObject } from "./storage.interface";
+import { QueryStorageInput, StorageFetchOptions, StorageModuleOptions, StorageObject, UploadOptions } from "./storage.interface";
 export declare class StorageService {
     private readonly config;
     constructor(config: StorageModuleOptions);
@@ -7,12 +7,19 @@ export declare class StorageService {
     queryStorage<T>({ endpoint, method, body, headers, responseType, }: QueryStorageInput): Promise<AxiosResponse<T, any>>;
     /**
      * @param file Express.Multer.File object.
+     * @param options optional OCR options to run during upload.
      * @returns the uploaded storage object from the storage service.
      * @description
      * Uploads a file to the storage service. The file should be an
      * Express.Multer.File object.
+     *
+     * Supported options:
+     * - `ocr: true` runs plain text OCR on the file after upload.
+     * - `ocrFields` runs structured field extraction. Pass a map of field names to descriptions.
+     *
+     * When OCR options are provided, the result is returned in `ocrResult`.
      */
-    upload(file: Express.Multer.File): Promise<StorageObject>;
+    upload(file: Express.Multer.File, options?: UploadOptions): Promise<StorageObject>;
     /**
      * @param id uuid given by the storage service
      * @param options optional transformation controls for image responses
