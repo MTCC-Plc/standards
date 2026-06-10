@@ -21,6 +21,6 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "form-data": "^4.0.3",
-    "standards-core": "github:MTCC-Plc/standards-core#a9dbf15"
+    "standards-core": "github:MTCC-Plc/standards-core#a9dbf15680c530ce475280800592f4c9a4de8259"
   }
 }
