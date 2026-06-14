@@ -10,6 +10,12 @@ export declare class HeraldService {
     private logger;
     constructor(config: HeraldConfig);
     queryHerald<T>(endpoint: string, method?: Method, body?: any, arrayBuffer?: boolean, headers?: Record<string, string>): Promise<T>;
+    /**
+     * Filters recipients against the `sendNotification` config allowlist.
+     * Returns the recipients allowed to receive notifications, or `null` when
+     * notifications should not be sent at all.
+     */
+    private filterRecipients;
     create(input: CreateNotificationInput): Promise<void>;
     sendSMS(phone: string, message: string): Promise<void>;
     sendEmail({ email, message, emailHtml, emailSubject }: SendEmailInput): Promise<void>;

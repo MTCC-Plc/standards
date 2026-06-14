@@ -9,7 +9,10 @@ import {
   ReadNotificationInput,
   SyncNotificationInput,
 } from "./dto";
-import { CreateNotificationInput } from "./dto/create-notification.input";
+import {
+  CreateNotificationInput,
+  NotificationRecipientInput,
+} from "./dto/create-notification.input";
 import { SendEmailWithAttachmentsInput } from "./dto/send-email-with-attachments.input";
 import { SendEmailInput } from "./dto/send-email.input";
 import { SyncResponse } from "./dto/sync.response";
@@ -50,31 +53,38 @@ export class HeraldService {
     return result.data;
   }
 
-  async create(input: CreateNotificationInput) {
-    const source = input.source ?? this.config.source;
+  /**
+   * Filters recipients against the `sendNotification` config allowlist.
+   * Returns the recipients allowed to receive notifications, or `null` when
+   * notifications should not be sent at all.
+   */
+  private filterRecipients(
+    recipients: NotificationRecipientInput[],
+  ): NotificationRecipientInput[] | null {
     switch (this.config.sendNotification) {
       case "false":
-        return;
+        return null;
       case undefined:
       case "true":
       case "":
-        break;
+        return recipients;
       default:
         const identifiers = this.config.sendNotification.split(",");
-        const allowedRecipients = [];
-        for (const i of input.recipients) {
-          if (
+        const allowedRecipients = recipients.filter(
+          (i) =>
             identifiers.includes(`${i.rcno}`) ||
             identifiers.includes(`${i.email}`) ||
-            identifiers.includes(`${i.phone}`)
-          ) {
-            allowedRecipients.push(i);
-          }
-        }
-        if (allowedRecipients.length === 0) return;
-        input.recipients = allowedRecipients;
+            identifiers.includes(`${i.phone}`),
+        );
+        return allowedRecipients.length === 0 ? null : allowedRecipients;
     }
-    if (input.recipients.length === 0) return;
+  }
+
+  async create(input: CreateNotificationInput) {
+    const source = input.source ?? this.config.source;
+    const recipients = this.filterRecipients(input.recipients);
+    if (!recipients || recipients.length === 0) return;
+    input.recipients = recipients;
     await this.queryHerald("notification", "post", {
       ...input,
       url: `${this.config.sourceBaseUrl ?? ""}${input.url ?? ""}`,
@@ -83,10 +93,11 @@ export class HeraldService {
   }
 
   async sendSMS(phone: string, message: string) {
-    if (this.config.sendNotification === "false") return;
+    const recipients = this.filterRecipients([{ phone }]);
+    if (!recipients) return;
     const input: CreateNotificationInput = {
       message,
-      recipients: [{ phone }],
+      recipients,
       source: this.config.source,
     };
     await this.queryHerald("notification/sms", "post", {
@@ -97,10 +108,11 @@ export class HeraldService {
   }
 
   async sendEmail({ email, message, emailHtml, emailSubject }: SendEmailInput) {
-    if (this.config.sendNotification === "false") return;
+    const recipients = this.filterRecipients([{ email }]);
+    if (!recipients) return;
     const input: CreateNotificationInput = {
       message,
-      recipients: [{ email }],
+      recipients,
       source: this.config.source,
       emailHtml,
       emailSubject,
@@ -120,11 +132,12 @@ export class HeraldService {
     emailSubject,
     attachments,
   }: SendEmailWithAttachmentsInput) {
-    if (this.config.sendNotification === "false") return;
+    const filteredRecipients = this.filterRecipients(recipients);
+    if (!filteredRecipients) return;
 
     const formData = new FormData();
     formData.append("message", message);
-    formData.append("recipients", JSON.stringify(recipients));
+    formData.append("recipients", JSON.stringify(filteredRecipients));
     formData.append("source", source ?? this.config.source);
     if (url) {
       formData.append("url", `${this.config.sourceBaseUrl ?? ""}${url}`);

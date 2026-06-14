@@ -52,43 +52,46 @@ let HeraldService = HeraldService_1 = class HeraldService {
             return result.data;
         });
     }
+    /**
+     * Filters recipients against the `sendNotification` config allowlist.
+     * Returns the recipients allowed to receive notifications, or `null` when
+     * notifications should not be sent at all.
+     */
+    filterRecipients(recipients) {
+        switch (this.config.sendNotification) {
+            case "false":
+                return null;
+            case undefined:
+            case "true":
+            case "":
+                return recipients;
+            default:
+                const identifiers = this.config.sendNotification.split(",");
+                const allowedRecipients = recipients.filter((i) => identifiers.includes(`${i.rcno}`) ||
+                    identifiers.includes(`${i.email}`) ||
+                    identifiers.includes(`${i.phone}`));
+                return allowedRecipients.length === 0 ? null : allowedRecipients;
+        }
+    }
     create(input) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c;
             const source = (_a = input.source) !== null && _a !== void 0 ? _a : this.config.source;
-            switch (this.config.sendNotification) {
-                case "false":
-                    return;
-                case undefined:
-                case "true":
-                case "":
-                    break;
-                default:
-                    const identifiers = this.config.sendNotification.split(",");
-                    const allowedRecipients = [];
-                    for (const i of input.recipients) {
-                        if (identifiers.includes(`${i.rcno}`) ||
-                            identifiers.includes(`${i.email}`) ||
-                            identifiers.includes(`${i.phone}`)) {
-                            allowedRecipients.push(i);
-                        }
-                    }
-                    if (allowedRecipients.length === 0)
-                        return;
-                    input.recipients = allowedRecipients;
-            }
-            if (input.recipients.length === 0)
+            const recipients = this.filterRecipients(input.recipients);
+            if (!recipients || recipients.length === 0)
                 return;
+            input.recipients = recipients;
             yield this.queryHerald("notification", "post", Object.assign(Object.assign({}, input), { url: `${(_b = this.config.sourceBaseUrl) !== null && _b !== void 0 ? _b : ""}${(_c = input.url) !== null && _c !== void 0 ? _c : ""}`, source }));
         });
     }
     sendSMS(phone, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.config.sendNotification === "false")
+            const recipients = this.filterRecipients([{ phone }]);
+            if (!recipients)
                 return;
             const input = {
                 message,
-                recipients: [{ phone }],
+                recipients,
                 source: this.config.source,
             };
             yield this.queryHerald("notification/sms", "post", Object.assign(Object.assign({}, input), { url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined, source: this.config.source }));
@@ -96,11 +99,12 @@ let HeraldService = HeraldService_1 = class HeraldService {
     }
     sendEmail(_a) {
         return __awaiter(this, arguments, void 0, function* ({ email, message, emailHtml, emailSubject }) {
-            if (this.config.sendNotification === "false")
+            const recipients = this.filterRecipients([{ email }]);
+            if (!recipients)
                 return;
             const input = {
                 message,
-                recipients: [{ email }],
+                recipients,
                 source: this.config.source,
                 emailHtml,
                 emailSubject,
@@ -111,11 +115,12 @@ let HeraldService = HeraldService_1 = class HeraldService {
     sendEmailWithAttachments(_a) {
         return __awaiter(this, arguments, void 0, function* ({ recipients, message, source, url, emailHtml, emailSubject, attachments, }) {
             var _b;
-            if (this.config.sendNotification === "false")
+            const filteredRecipients = this.filterRecipients(recipients);
+            if (!filteredRecipients)
                 return;
             const formData = new FormData();
             formData.append("message", message);
-            formData.append("recipients", JSON.stringify(recipients));
+            formData.append("recipients", JSON.stringify(filteredRecipients));
             formData.append("source", source !== null && source !== void 0 ? source : this.config.source);
             if (url) {
                 formData.append("url", `${(_b = this.config.sourceBaseUrl) !== null && _b !== void 0 ? _b : ""}${url}`);
