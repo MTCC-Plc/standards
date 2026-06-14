@@ -76,6 +76,23 @@ export class AttachmentController {
 }
 ```
 
+OCR can also be run during upload by passing options. This runs in parallel with the upload so it does not add much latency. The result is returned on the `ocrResult` field of the uploaded object.
+
+```ts
+// plain text OCR
+const object = await this.storageService.upload(file, { ocr: true });
+const text = object.ocrResult as string;
+
+// structured field extraction — keys are field names, values are descriptions
+const object = await this.storageService.upload(file, {
+  ocrFields: {
+    name: "Full name of the card holder",
+    idCardNo: "The ID card number",
+  },
+});
+const fields = object.ocrResult as Record<string, string>;
+```
+
 #### Serve a file
 
 Example of how files should be served with the upload service. The serve method will fetch the file and also set the relevant headers.
@@ -104,9 +121,21 @@ export class AttachmentController {
 }
 ```
 
+Images are converted to WebP on the fly when served. The following options can be passed to `serve` (and `fetch`):
+
+- `original: true` serves the original stored object without WebP conversion.
+- `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
+- `quality` sets WebP quality for lossy responses. Default is 80.
+- `width` and `height` resize the image. Images can only be scaled down, not up. If only one is provided, the other is auto-scaled to preserve the aspect ratio.
+
+```ts
+// serve a 200px wide thumbnail
+await this.storageService.serve(params.id, res, { width: 200 });
+```
+
 #### Run OCR on a file
 
-Example of how OCR can be run on a file. Only applicable to images. Throws an error if the object is not a valid image. Cleaning and parsing must be done on the resulting text to extract the required data.
+Example of how OCR can be run on a file. Only applicable to images and PDFs. Throws an error if the object is not a supported type. The result is cached on the object, so repeat calls return the stored text. Cleaning and parsing must be done on the resulting text to extract the required data.
 
 ```ts
 // attachment.service.ts
@@ -120,6 +149,29 @@ export class AttachmentService {
     // cleaning and parsing of the ocr text
     const idCardNo = text.split("\n").find((l) => l.includes("A"));
     return idCardNo;
+  }
+}
+```
+
+#### Extract structured fields
+
+Instead of cleaning and parsing raw OCR text yourself, you can ask the service to extract specific fields. Pass a map of field names to descriptions of what each field is, and the service returns a map of those field names to their extracted values. Only applicable to images and PDFs.
+
+Results are cached per object and field set. Pass `{ force: true }` to bypass the cache and re-run extraction.
+
+```ts
+// attachment.service.ts
+import { StorageService } from "standards";
+export class AttachmentService {
+  constructor(private storageService: StorageService) {}
+
+  async getIdCardDetails(id: string) {
+    const fields = await this.storageService.extract(id, {
+      name: "Full name of the card holder",
+      idCardNo: "The ID card number",
+      dateOfBirth: "Date of birth in YYYY-MM-DD format",
+    });
+    return fields; // { name: "...", idCardNo: "...", dateOfBirth: "..." }
   }
 }
 ```

@@ -18,10 +18,18 @@ export interface StorageFetchOptions {
     original?: boolean;
     lossy?: boolean;
     quality?: number;
+    width?: number;
+    height?: number;
 }
 export interface OcrResponse {
     text: string;
 }
+export interface ExtractFieldsOptions {
+    /** Re-run extraction even if a cached result exists for the same field set. */
+    force?: boolean;
+}
+/** Map of field names to their extracted string values. */
+export type ExtractFieldsResult = Record<string, string>;
 export interface StorageObject {
     id: string;
     createdAt: string;

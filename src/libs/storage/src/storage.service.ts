@@ -10,6 +10,8 @@ import {
 import axios, { AxiosResponse } from "axios";
 import * as FormData from "form-data";
 import {
+  ExtractFieldsOptions,
+  ExtractFieldsResult,
   OcrResponse,
   QueryStorageInput,
   StorageFetchOptions,
@@ -33,6 +35,12 @@ export class StorageService {
     }
     if (options?.quality !== undefined) {
       params.set("quality", `${options.quality}`);
+    }
+    if (options?.width !== undefined) {
+      params.set("width", `${options.width}`);
+    }
+    if (options?.height !== undefined) {
+      params.set("height", `${options.height}`);
     }
 
     const query = params.toString();
@@ -151,6 +159,9 @@ export class StorageService {
    * - `original: true` serves the original stored object without WebP conversion.
    * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
    * - `quality` sets WebP quality for lossy responses. Default is 80.
+   * - `width` and `height` can be added for resizing images. Can only be resized
+   *   down, not up. If only one is provided, the other will be auto-scaled to
+   *   preserve aspect ratio.
    */
   async fetch(
     id: string,
@@ -166,9 +177,11 @@ export class StorageService {
 
   /**
    * @param id uuid given by the storage service
-   * @returns AxiosResponse with the file data.
+   * @returns the plain text extracted from the object.
    * @description
-   * Runs ocr on the object. Throws an error if the object is not a valid image.
+   * Runs plain text OCR on the object. Only applicable to images and PDFs.
+   * Throws an error if the object is not a supported type. The result is
+   * cached on the object, so repeat calls return the stored text.
    */
   async ocr(id: string): Promise<string> {
     const resp = await this.queryStorage<OcrResponse>({
@@ -176,6 +189,31 @@ export class StorageService {
       method: "get",
     });
     return resp.data.text;
+  }
+
+  /**
+   * @param id uuid given by the storage service
+   * @param fields map of field names to descriptions of what to extract
+   * @param options optional extraction controls
+   * @returns a map of the requested field names to their extracted values.
+   * @description
+   * Runs structured field extraction on an existing object. Only applicable to
+   * images and PDFs. Throws an error if the object is not a supported type.
+   *
+   * Results are cached per object and field set. Pass `force: true` to bypass
+   * the cache and re-run extraction.
+   */
+  async extract(
+    id: string,
+    fields: Record<string, string>,
+    options?: ExtractFieldsOptions,
+  ): Promise<ExtractFieldsResult> {
+    const resp = await this.queryStorage<ExtractFieldsResult>({
+      endpoint: `s/${id}/ocr/extract`,
+      method: "post",
+      body: { fields, force: options?.force },
+    });
+    return resp.data;
   }
 
   /**
@@ -191,6 +229,9 @@ export class StorageService {
    * - `original: true` serves the original stored object without WebP conversion.
    * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
    * - `quality` sets WebP quality for lossy responses. Default is 80.
+   * - `width` and `height` can be added for resizing images. Can only be resized
+   *   down, not up. If only one is provided, the other will be auto-scaled to
+   *   preserve aspect ratio.
    */
   async serve(id: string, res: any, options?: StorageFetchOptions) {
     const resp = await this.queryStorage<string>({
