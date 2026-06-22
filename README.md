@@ -23,6 +23,7 @@ Either the short or long hash are fine.
 Nestjs libraries can be imported.
 Check the library readmes for details.
 
+- [APS](./src/libs/aps/README.md) - Integration with the APS API.
 - [Herald](./src/libs/herald/README.md) - Integration with the Herald API.
 - [Cluster](./src/libs/cluster/README.md) - Clustering a Nestjs app.
 - [Standard Logger](./src/libs/logger/README.md) - Standard logger for a Nestjs app.

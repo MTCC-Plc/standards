@@ -1,4 +1,5 @@
 export * from "standards-core";
+export * from "./libs/aps/src";
 export * from "./libs/cluster";
 export * from "./libs/herald/src";
 export * from "./libs/logger";
