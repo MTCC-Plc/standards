@@ -20,7 +20,6 @@ export interface Employee {
   post: string | null;
   level_grade_id: number;
   level_grade: string | null;
-  basic_salary: number;
   company_id: number;
   company: string | null;
   division_id: number;
