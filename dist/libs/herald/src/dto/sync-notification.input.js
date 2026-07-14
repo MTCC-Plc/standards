@@ -20,6 +20,7 @@ __decorate([
 ], SyncNotificationInput.prototype, "sourceId", void 0);
 __decorate([
     (0, class_validator_1.IsDate)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Date)
 ], SyncNotificationInput.prototype, "createdAt", void 0);
 __decorate([

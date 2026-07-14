@@ -1,12 +1,18 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from "@nestjs/common";
 import axios, { Method } from "axios";
 import {
-  GetNotificationInput,
+  MAX_EMAIL_ATTACHMENT_COUNT,
+  MAX_EMAIL_ATTACHMENT_SIZE,
+} from "./constants";
+import {
+  GetNotificationClientInput,
   ReadNotificationInput,
+  RecipientNotification,
   SyncNotificationInput,
 } from "./dto";
 import {
@@ -80,6 +86,16 @@ export class HeraldService {
     }
   }
 
+  /**
+   * Prefixes a source relative url with the configured `sourceBaseUrl`.
+   * Returns undefined when no url is given, so that the notification is stored
+   * without a url instead of pointing at the bare base url.
+   */
+  private buildUrl(url?: string): string | undefined {
+    if (!url) return undefined;
+    return `${this.config.sourceBaseUrl ?? ""}${url}`;
+  }
+
   async create(input: CreateNotificationInput) {
     const source = input.source ?? this.config.source;
     const recipients = this.filterRecipients(input.recipients);
@@ -87,7 +103,7 @@ export class HeraldService {
     input.recipients = recipients;
     await this.queryHerald("notification", "post", {
       ...input,
-      url: `${this.config.sourceBaseUrl ?? ""}${input.url ?? ""}`,
+      url: this.buildUrl(input.url),
       source,
     });
   }
@@ -95,31 +111,29 @@ export class HeraldService {
   async sendSMS(phone: string, message: string) {
     const recipients = this.filterRecipients([{ phone }]);
     if (!recipients) return;
-    const input: CreateNotificationInput = {
+    await this.queryHerald("notification/sms", "post", {
       message,
       recipients,
-      source: this.config.source,
-    };
-    await this.queryHerald("notification/sms", "post", {
-      ...input,
-      url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined,
       source: this.config.source,
     });
   }
 
-  async sendEmail({ email, message, emailHtml, emailSubject }: SendEmailInput) {
+  async sendEmail({
+    email,
+    message,
+    url,
+    emailHtml,
+    emailSubject,
+  }: SendEmailInput) {
     const recipients = this.filterRecipients([{ email }]);
     if (!recipients) return;
-    const input: CreateNotificationInput = {
+    await this.queryHerald("notification/email", "post", {
       message,
       recipients,
       source: this.config.source,
+      url: this.buildUrl(url),
       emailHtml,
       emailSubject,
-    };
-    await this.queryHerald("notification/email", "post", {
-      ...input,
-      url: input.url ? `${this.config.heraldApiKey}${input.url}` : undefined,
     });
   }
 
@@ -135,12 +149,28 @@ export class HeraldService {
     const filteredRecipients = this.filterRecipients(recipients);
     if (!filteredRecipients) return;
 
+    if (attachments.length > MAX_EMAIL_ATTACHMENT_COUNT) {
+      throw new BadRequestException(
+        `A maximum of ${MAX_EMAIL_ATTACHMENT_COUNT} attachments can be sent at a time.`,
+      );
+    }
+    for (const attachment of attachments) {
+      if (attachment.content.length > MAX_EMAIL_ATTACHMENT_SIZE) {
+        throw new BadRequestException(
+          `Attachment ${attachment.filename} exceeds the maximum size of ${
+            MAX_EMAIL_ATTACHMENT_SIZE / (1024 * 1024)
+          } MB.`,
+        );
+      }
+    }
+
     const formData = new FormData();
     formData.append("message", message);
     formData.append("recipients", JSON.stringify(filteredRecipients));
     formData.append("source", source ?? this.config.source);
-    if (url) {
-      formData.append("url", `${this.config.sourceBaseUrl ?? ""}${url}`);
+    const notificationUrl = this.buildUrl(url);
+    if (notificationUrl) {
+      formData.append("url", notificationUrl);
     }
     if (emailHtml) {
       formData.append("emailHtml", emailHtml);
@@ -164,20 +194,42 @@ export class HeraldService {
     );
   }
 
-  async get({ source, rcno, read, beforeId }: GetNotificationInput) {
-    let queryParams = "?";
-    for (const param of [source, rcno, read, beforeId]) {
-      if (param) queryParams += `${param}&`;
+  async get({
+    source,
+    rcno,
+    email,
+    phone,
+    read,
+    beforeId,
+  }: GetNotificationClientInput): Promise<RecipientNotification[]> {
+    const params: Record<string, string | number | boolean | undefined> = {
+      source: source ?? this.config.source,
+      rcno,
+      email,
+      phone,
+      read,
+      beforeId,
+    };
+    const queryParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || value === null || value === "") continue;
+      queryParams.append(key, `${value}`);
     }
-    await this.queryHerald(`notification${queryParams}`, "get");
+    return await this.queryHerald<RecipientNotification[]>(
+      `notification?${queryParams.toString()}`,
+      "get",
+    );
   }
 
   async read(input: ReadNotificationInput) {
     await this.queryHerald("notification/read", "post", input);
   }
 
-  async readAll(input: GetNotificationInput) {
-    await this.queryHerald("notification/readall", "post", input);
+  async readAll(input: GetNotificationClientInput) {
+    await this.queryHerald("notification/readall", "post", {
+      ...input,
+      source: input.source ?? this.config.source,
+    });
   }
 
   async syncLegacyNotifications(

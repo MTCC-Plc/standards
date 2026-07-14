@@ -18,6 +18,7 @@ __exportStar(require("./create-notification.input"), exports);
 __exportStar(require("./get-notification.input"), exports);
 __exportStar(require("./notification-connection.args"), exports);
 __exportStar(require("./read-notification.input"), exports);
+__exportStar(require("./recipient-notification.response"), exports);
 __exportStar(require("./send-email-with-attachments.input"), exports);
 __exportStar(require("./send-email.input"), exports);
 __exportStar(require("./sync-notification.input"), exports);

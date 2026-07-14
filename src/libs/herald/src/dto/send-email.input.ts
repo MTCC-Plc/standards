@@ -9,6 +9,10 @@ export class SendEmailInput {
 
   @IsString()
   @IsOptional()
+  url?: string;
+
+  @IsString()
+  @IsOptional()
   emailHtml?: string;
 
   @IsString()

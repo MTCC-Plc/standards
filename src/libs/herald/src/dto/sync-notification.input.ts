@@ -11,6 +11,7 @@ export class SyncNotificationInput {
   sourceId: number;
 
   @IsDate()
+  @IsOptional()
   createdAt?: Date;
 
   @IsInt()

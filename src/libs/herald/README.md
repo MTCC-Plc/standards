@@ -12,8 +12,8 @@ import { HeraldModule } from 'standards';
 @Module({
   imports: [
     HeraldModule.register({
-      baseUrl: process.env.HERALD_URL,
-      apiKey: process.env.HERALD_KEY,
+      heraldApiUrl: process.env.HERALD_URL,
+      heraldApiKey: process.env.HERALD_KEY,
       sendNotification: process.env.SEND_NOTIFICATION,
       sourceBaseUrl: process.env.APP_URL,
       source: 'App'
@@ -25,8 +25,8 @@ import { HeraldModule } from 'standards';
     HeraldModule.forRootAsync({
       useFactory: async (configService: ConfigService) => {
         return {
-          baseUrl: configService.get('HERALD_URL'),
-          apiKey: configService.get('HERALD_KEY'),
+          heraldApiUrl: configService.get('HERALD_URL'),
+          heraldApiKey: configService.get('HERALD_KEY'),
           sendNotification: configService.get('SEND_NOTIFICATION'),
           sourceBaseUrl: configService.get('APP_URL'),
           source: 'App',
@@ -38,13 +38,26 @@ import { HeraldModule } from 'standards';
 ```
 
 - `heraldApiUrl` URL of herald API
-- `heraldApiKey` API key for herald API
+- `heraldApiKey` API key for herald API. Sent as the `Authorization` header on every request. The key needs the permission of each endpoint being used.
 - `source` Source of the notifications to be generated or fetched i.e. the name of the app using this service
-- `sourceBaseUrl` Base url of the source frontend
+- `sourceBaseUrl` Base url of the source frontend. Any `url` passed to a notification is treated as a path relative to this and is prefixed with it.
 - `sendNotification` Meant to be used in development. If false is passed, notifications will not be created. If a list of rcnos, emails or phone numbers are passed, will only create notifications for recipients having those rcnos, emails or phone numbers. In production, this can be either be undefined, empty string or 'true'.
 
 Use `HeraldService` in your services that create notifications.
 Check [Herald API usage](https://github.com/MTCC-Plc/herald-api?tab=readme-ov-file#usage) for details of all the individual functions. There is a equivalent function in this service for every herald endpoint.
+
+| Method                        | Endpoint                                   | Permission           | Description                                                              |
+| ----------------------------- | ------------------------------------------ | -------------------- | ------------------------------------------------------------------------ |
+| `create()`                    | `POST /notification`                       | `CreateNotification` | Notify employees over the given scopes. Queued, so it does not send immediately |
+| `sendSMS()`                   | `POST /notification/sms`                   | `CreateSMS`          | Send an SMS to a non employee                                            |
+| `sendEmail()`                 | `POST /notification/email`                 | `CreateEmail`        | Send an email to a non employee                                          |
+| `sendEmailWithAttachments()`  | `POST /notification/email-with-attachments`| `CreateEmail`        | Send an email with attachments. Sent during the request, not queued      |
+| `get()`                       | `GET /notification`                        | `ViewNotification`   | Fetch a user's notifications for the source. 10 at a time                |
+| `read()`                      | `POST /notification/read`                  | `ReadNotification`   | Mark specific notifications as read                                      |
+| `readAll()`                   | `POST /notification/readall`               | `ReadNotification`   | Mark all of a user's notifications in the source as read                 |
+| `syncLegacyNotifications()`   | `POST /notification/sync`                  | `CreateNotification` | Port notifications from a legacy system without sending them             |
+
+`source` defaults to the module `source` on every method, so it only needs to be passed when notifying on behalf of another app.
 
 ```ts
 // random.service.ts
@@ -100,3 +113,45 @@ export class RandomService {
 - `emailHtml`: optional custom HTML body.
 - `emailSubject`: optional email subject.
 - `attachments`: array of files with `filename`, `content` as a `Buffer`, and optional `contentType`.
+
+Herald accepts a maximum of `MAX_EMAIL_ATTACHMENT_COUNT` (10) attachments of `MAX_EMAIL_ATTACHMENT_SIZE` (10 MB) each. Both constants are exported, and this method throws a `BadRequestException` before making the request if either is exceeded.
+
+### Fetching and reading notifications
+
+`get()` returns the notifications of a single user for the source, 10 at a time, newest first. `source` defaults to the module source, and one of `rcno`, `email` or `phone` is required. Pass `beforeId` with the id of the oldest notification you already have to page with a load more.
+
+```ts
+const notifications = await this.heraldService.get({ rcno: 7145 });
+const older = await this.heraldService.get({
+  rcno: 7145,
+  read: false,
+  beforeId: notifications[notifications.length - 1].id,
+});
+```
+
+Each result is a `RecipientNotification`, which is one row per recipient rather than per notification:
+
+```ts
+interface RecipientNotification {
+  id: number;
+  createdAt: Date;
+  requestId: string;
+  source: string;
+  message: string;
+  url?: string;
+  rcno?: number;
+  read: boolean;
+}
+```
+
+`read()` marks specific notifications of a user as read using the `requestId`s from the results above. `readAll()` marks every notification of a user in the source as read.
+
+```ts
+await this.heraldService.read({
+  rcno: 7145,
+  requestIds: ["2dde4594-2c34-4f75-89aa-9fea465e2581"],
+});
+await this.heraldService.readAll({ rcno: 7145 });
+```
+
+Note that these endpoints are better called over graphql straight from the frontend where the app uses AD auth, to avoid the extra hop through the app backend. See the [Herald API usage](https://github.com/MTCC-Plc/herald-api?tab=readme-ov-file#usage) notes.

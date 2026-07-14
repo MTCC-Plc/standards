@@ -3,3 +3,5 @@ export declare const NOTIFICATION_SCOPES: {
     identifier: string;
 }[];
 export declare const NOTIFICATION_SCOPE_NAMES: string[];
+export declare const MAX_EMAIL_ATTACHMENT_COUNT = 10;
+export declare const MAX_EMAIL_ATTACHMENT_SIZE: number;
