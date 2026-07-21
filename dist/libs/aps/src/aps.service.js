@@ -232,6 +232,11 @@ let ApsService = class ApsService {
             return this.queryAps("leave/days", "get", undefined, { leaveId });
         });
     }
+    getCurrentCoveringEmployee(rcno) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.queryAps("leave/covering-employee", "get", undefined, { rcno });
+        });
+    }
     // ─── Sites / Projects ─────────────────────────────────────────────────────────
     getSites() {
         return __awaiter(this, void 0, void 0, function* () {

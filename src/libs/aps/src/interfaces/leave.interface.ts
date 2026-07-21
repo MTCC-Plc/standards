@@ -41,6 +41,15 @@ export interface LeaveRequest {
   leaveCalendarDays?: number | null;
 }
 
+export interface CurrentCoveringEmployee {
+  rcno: number;
+  name: string;
+  division: string;
+  post: string;
+  from_date: string;
+  to_date: string;
+}
+
 export interface LeaveAllocation {
   id: number;
   leave_type_id: number;
