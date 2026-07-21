@@ -81,7 +81,7 @@ export class ExampleService {
 | `getEmployeeFull(params)` | `GET /employee/full` | `GET_EMPLOYEE` |
 | `getEmployeesFullMany(rcnos)` | `GET /employee/full/many` | `GET_EMPLOYEE` |
 | `getResignedEmployees(params?)` | `GET /employee/resigned` | `GET_EMPLOYEE` |
-| `getEmployeePosts()` | `GET /employee/posts` | `GET_EMPLOYEE` |
+| `getEmployeePosts(params?)` | `GET /employee/posts` | `GET_EMPLOYEE` |
 | `getEmployeeRcnos()` | `GET /employee/rcno` | `GET_EMPLOYEE` |
 | `getEmployeeRcnoList(params?)` | `GET /employee/rcno/list` | `GET_EMPLOYEE` |
 | `getEmployeeList(params?)` | `GET /employee/list` | `GET_EMPLOYEE` |
@@ -92,6 +92,7 @@ export class ExampleService {
 | `getLeavesBetween(input)` | `GET /leave/between` | `GET_LEAVES` |
 | `getLeavesIn(input)` | `POST /leave/in` | `GET_LEAVES` |
 | `getLeaveDays(leaveId)` | `GET /leave/days` | `GET_LEAVES` |
+| `getCurrentCoveringEmployee(rcno)` | `GET /leave/covering-employee` | `GET_LEAVES` |
 | `getSites()` | `GET /projects` | `GET_PROJECTS` |
 | `getSiteEmployees(ids)` | `GET /projects/employees` | `GET_PROJECTS` |
 | `getSiteAttendance(id, date)` | `GET /projects/:id/attendance` | `GET_PROJECTS`, `GET_ATTENDANCE` |

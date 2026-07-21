@@ -176,9 +176,9 @@ let ApsService = class ApsService {
             return this.queryAps("employee/resigned", "get", undefined, params ? this.buildParams(params) : undefined);
         });
     }
-    getEmployeePosts() {
+    getEmployeePosts(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.queryAps("employee/posts");
+            return this.queryAps("employee/posts", "get", undefined, params ? this.buildParams(params) : undefined);
         });
     }
     getEmployeeRcnos() {

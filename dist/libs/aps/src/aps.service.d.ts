@@ -3,7 +3,7 @@ import { AttendanceDevice, AttendanceDeviceLastEvent, Duty, MatrixPacket, Payrol
 import { GraphToken, SharePointToken } from "./interfaces/attachment.interface";
 import { Calendar } from "./interfaces/calendar.interface";
 import { Division, DivisionWithHOD } from "./interfaces/division.interface";
-import { Employee, EmployeeListQueryDto, EmployeePost, GetEmployeeFullParams, GetEmployeeParams, GetResignedParams, HrisCreateDto, HrisSsoSyncDto, HrisSyncDto, PaginatedResponse, TimesheetInput } from "./interfaces/employee.interface";
+import { Employee, EmployeeListQueryDto, EmployeePost, GetEmployeeFullParams, GetEmployeeParams, GetEmployeePostsParams, GetResignedParams, HrisCreateDto, HrisSsoSyncDto, HrisSyncDto, PaginatedResponse, TimesheetInput } from "./interfaces/employee.interface";
 import { GetHierarchyParams, StaffHierarchy } from "./interfaces/hierarchy.interface";
 import { CurrentCoveringEmployee, LeaveAllocation, LeaveRequest, LeaveRequestsInInput, LeavesBetweenInput, LeaveType } from "./interfaces/leave.interface";
 import { DayBasedShiftTime, ShiftPlan } from "./interfaces/shift-plan.interface";
@@ -31,7 +31,7 @@ export declare class ApsService {
     getEmployeeFull(params: GetEmployeeFullParams): Promise<Employee>;
     getEmployeesFullMany(rcnos: number[]): Promise<Employee[]>;
     getResignedEmployees(params?: GetResignedParams): Promise<Employee[]>;
-    getEmployeePosts(): Promise<EmployeePost[]>;
+    getEmployeePosts(params?: GetEmployeePostsParams): Promise<EmployeePost[]>;
     getEmployeeRcnos(): Promise<number[]>;
     getEmployeeRcnoList(params?: EmployeeListQueryDto): Promise<PaginatedResponse<Employee>>;
     getEmployeeList(params?: EmployeeListQueryDto): Promise<PaginatedResponse<Employee>>;

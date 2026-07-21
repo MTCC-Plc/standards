@@ -181,6 +181,9 @@ export interface HrisCreateDto {
     education_level?: number | null;
     work_type_id?: number | null;
 }
+export interface GetEmployeePostsParams {
+    divisions?: string[];
+}
 export interface EmployeePost {
     division_id: number;
     division_code: string;

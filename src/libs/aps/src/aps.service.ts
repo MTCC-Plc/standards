@@ -24,6 +24,7 @@ import {
   EmployeePost,
   GetEmployeeFullParams,
   GetEmployeeParams,
+  GetEmployeePostsParams,
   GetResignedParams,
   HrisCreateDto,
   HrisSsoSyncDto,
@@ -235,8 +236,15 @@ export class ApsService {
     );
   }
 
-  async getEmployeePosts(): Promise<EmployeePost[]> {
-    return this.queryAps<EmployeePost[]>("employee/posts");
+  async getEmployeePosts(
+    params?: GetEmployeePostsParams,
+  ): Promise<EmployeePost[]> {
+    return this.queryAps<EmployeePost[]>(
+      "employee/posts",
+      "get",
+      undefined,
+      params ? this.buildParams(params) : undefined,
+    );
   }
 
   async getEmployeeRcnos(): Promise<number[]> {
