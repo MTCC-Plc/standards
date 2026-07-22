@@ -1,6 +1,6 @@
 {
   "name": "standards",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Common standards used within MTCC",
   "main": "dist/index.js",
   "scripts": {
