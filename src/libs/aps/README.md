@@ -93,6 +93,7 @@ export class ExampleService {
 | `getLeavesIn(input)` | `POST /leave/in` | `GET_LEAVES` |
 | `getLeaveDays(leaveId)` | `GET /leave/days` | `GET_LEAVES` |
 | `getCurrentCoveringEmployee(rcno)` | `GET /leave/covering-employee` | `GET_LEAVES` |
+| `getEmployeesCoveredBy(rcno)` | `GET /leave/covering-for` | `GET_LEAVES` |
 | `getSites()` | `GET /projects` | `GET_PROJECTS` |
 | `getSiteEmployees(ids)` | `GET /projects/employees` | `GET_PROJECTS` |
 | `getSiteAttendance(id, date)` | `GET /projects/:id/attendance` | `GET_PROJECTS`, `GET_ATTENDANCE` |

@@ -5,7 +5,7 @@ import { Calendar } from "./interfaces/calendar.interface";
 import { Division, DivisionWithHOD } from "./interfaces/division.interface";
 import { Employee, EmployeeListQueryDto, EmployeePost, GetEmployeeFullParams, GetEmployeeParams, GetEmployeePostsParams, GetResignedParams, HrisCreateDto, HrisSsoSyncDto, HrisSyncDto, PaginatedResponse, TimesheetInput } from "./interfaces/employee.interface";
 import { GetHierarchyParams, StaffHierarchy } from "./interfaces/hierarchy.interface";
-import { CurrentCoveringEmployee, LeaveAllocation, LeaveRequest, LeaveRequestsInInput, LeavesBetweenInput, LeaveType } from "./interfaces/leave.interface";
+import { CoveredEmployee, CurrentCoveringEmployee, LeaveAllocation, LeaveRequest, LeaveRequestsInInput, LeavesBetweenInput, LeaveType } from "./interfaces/leave.interface";
 import { DayBasedShiftTime, ShiftPlan } from "./interfaces/shift-plan.interface";
 export declare class ApsService {
     private config;
@@ -43,6 +43,7 @@ export declare class ApsService {
     getLeavesIn(input: LeaveRequestsInInput): Promise<LeaveRequest[]>;
     getLeaveDays(leaveId: string): Promise<number>;
     getCurrentCoveringEmployee(rcno: string | number): Promise<CurrentCoveringEmployee | null>;
+    getEmployeesCoveredBy(rcno: string | number): Promise<CoveredEmployee[]>;
     getSites(): Promise<Site[]>;
     getSiteEmployees(ids: string[]): Promise<SiteWithEmployees[]>;
     getSiteAttendance(id: string, date: string): Promise<SiteAttendanceEmployee[]>;

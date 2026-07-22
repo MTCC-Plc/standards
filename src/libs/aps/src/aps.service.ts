@@ -37,6 +37,7 @@ import {
   StaffHierarchy,
 } from "./interfaces/hierarchy.interface";
 import {
+  CoveredEmployee,
   CurrentCoveringEmployee,
   LeaveAllocation,
   LeaveRequest,
@@ -313,6 +314,17 @@ export class ApsService {
   ): Promise<CurrentCoveringEmployee | null> {
     return this.queryAps<CurrentCoveringEmployee | null>(
       "leave/covering-employee",
+      "get",
+      undefined,
+      { rcno },
+    );
+  }
+
+  async getEmployeesCoveredBy(
+    rcno: string | number,
+  ): Promise<CoveredEmployee[]> {
+    return this.queryAps<CoveredEmployee[]>(
+      "leave/covering-for",
       "get",
       undefined,
       { rcno },
