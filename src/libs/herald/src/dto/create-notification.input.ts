@@ -9,6 +9,10 @@ import {
 } from "class-validator";
 import { NOTIFICATION_SCOPE_NAMES } from "../constants";
 
+// An adaptive card, given either as the card JSON object or as a JSON string of
+// it. See https://adaptivecards.io/designer for the schema.
+export type AdaptiveCard = Record<string, any> | string;
+
 export class CreateNotificationInput {
   @IsArray()
   @ValidateNested()
@@ -31,6 +35,11 @@ export class CreateNotificationInput {
   @IsString()
   @IsOptional()
   emailSubject?: string;
+
+  // Only rendered by the teams scope. Every other scope falls back to `message`,
+  // which is also what is stored in the notification log, so it stays required.
+  @IsOptional()
+  adaptiveCard?: AdaptiveCard;
 
   @IsArray()
   @IsIn(NOTIFICATION_SCOPE_NAMES, { each: true })

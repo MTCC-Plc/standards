@@ -49,6 +49,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateNotificationInput.prototype, "emailSubject", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateNotificationInput.prototype, "adaptiveCard", void 0);
+__decorate([
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsIn)(constants_1.NOTIFICATION_SCOPE_NAMES, { each: true }),
     (0, class_validator_1.IsOptional)(),

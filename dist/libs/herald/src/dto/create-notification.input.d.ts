@@ -1,3 +1,4 @@
+export type AdaptiveCard = Record<string, any> | string;
 export declare class CreateNotificationInput {
     recipients: NotificationRecipientInput[];
     source?: string;
@@ -5,6 +6,7 @@ export declare class CreateNotificationInput {
     url?: string;
     emailHtml?: string;
     emailSubject?: string;
+    adaptiveCard?: AdaptiveCard;
     scopes?: string[];
     sendAllScopes?: boolean;
     ignoreLimit?: boolean;

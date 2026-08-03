@@ -74,6 +74,59 @@ export class RandomService {
 }
 ```
 
+### Sending adaptive cards over Teams
+
+Pass `adaptiveCard` to `create()` to have the `teams` scope send an [adaptive card](https://adaptivecards.io/designer) instead of a plain text message. The card is accepted as the card object or as a JSON string of it, and is sent to Teams as given, so the `url` link and the source footer that the normal Teams message adds have to be part of the card itself.
+
+Only the `teams` scope renders the card. Every other scope falls back to `message`, and `message` is also what is stored in the notification log and shown in the in-app notification list, so it stays required and should describe the card.
+
+```ts
+import { HeraldService } from "standards";
+
+export class RandomService {
+  constructor(private heraldService: HeraldService) {}
+
+  async requestApproval() {
+    await this.heraldService.create({
+      message: "Leave request from Ahmed",
+      recipients: [{ rcno: 7145 }],
+      scopes: ["teams"],
+      adaptiveCard: {
+        type: "AdaptiveCard",
+        $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+        version: "1.4",
+        body: [
+          {
+            type: "TextBlock",
+            text: "Leave request",
+            weight: "Bolder",
+            size: "Medium",
+          },
+          {
+            type: "FactSet",
+            facts: [
+              { title: "From", value: "Ahmed" },
+              { title: "Days", value: "3" },
+            ],
+          },
+        ],
+        actions: [
+          {
+            type: "Action.OpenUrl",
+            title: "View",
+            url: "https://my.mtcc.com.mv/leave/approvals",
+          },
+        ],
+      },
+    });
+  }
+}
+```
+
+Herald validates the card on the request, so an invalid card throws instead of failing later in its queue. The card must be an object with `type` set to `AdaptiveCard` and a `body` or `actions` array. `version` defaults to `1.4` when not given.
+
+Note that `url` on the notification is still used by the other scopes and the in-app notification, so keep passing it even when the card has its own `Action.OpenUrl`. Unlike `url`, links inside the card are not prefixed with `sourceBaseUrl`.
+
 ### Sending emails with attachments
 
 Use `sendEmailWithAttachments()` for the dedicated attachment endpoint. This sends the email directly through Herald using `multipart/form-data`, while the regular `sendEmail()` method remains unchanged.
