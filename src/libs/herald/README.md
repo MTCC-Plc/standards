@@ -80,6 +80,8 @@ Pass `adaptiveCard` to `create()` to have the `teams` scope send an [adaptive ca
 
 Only the `teams` scope renders the card. Every other scope falls back to `message`, and `message` is also what is stored in the notification log and shown in the in-app notification list, so it stays required and should describe the card.
 
+On Teams, `message` is sent as the text of the message and shows as a line above the card. Teams builds the chat list, activity feed and push notification preview from that text, so a card sent without it previews as blank. Keep `message` short so it reads as a heading for the card.
+
 ```ts
 import { HeraldService } from "standards";
 
