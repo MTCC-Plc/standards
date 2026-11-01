@@ -95,12 +95,13 @@ const fields = object.ocrResult as Record<string, string>;
 
 #### Serve a file
 
-Example of how files should be served with the upload service. The serve method will fetch the file and also set the relevant headers.
+Example of how files should be served with the upload service. The serve method streams the file to the client without buffering it in memory, and passes through the relevant headers.
 
 - Content-Length: For indicating file size and checking download progress
 - Content-Disposition: To provide the file name when downloading
 - Content-Type: For viewing within the browser
 - Cache-Control: For caching in the browser. Set to 1 week.
+- Accept-Ranges, Content-Range, ETag: For streaming, seeking and revalidation
 
 The `serve` method should be called at the end of the controller as it will terminate the http request.
 
@@ -131,6 +132,53 @@ Images are converted to WebP on the fly when served. The following options can b
 ```ts
 // serve a 200px wide thumbnail
 await this.storageService.serve(params.id, res, { width: 200 });
+```
+
+#### Stream video and audio
+
+`serve` forwards the incoming request's `Range`, `If-Range` and `If-None-Match` headers to the storage service. Endpoints that use it therefore support streaming and seeking, so they can be used directly as the `src` of a `<video>` or `<audio>` element. `HEAD` requests are answered without downloading the file. No extra code is needed in the controller:
+
+```ts
+@Get(":id/video")
+async streamVideo(@Param() params, @Res() res) {
+  // check user access, etc
+  await this.storageService.serve(params.id, res);
+}
+```
+
+```html
+<video controls src="/api/attachment/123/video"></video>
+```
+
+The browser will make many range requests while the video plays and seeks, so keep the access checks in this endpoint cheap. Pass `range` in the options to override the incoming header.
+
+`serve` currently supports express-based apps only (it uses `res.req`, `res.status` and `res.set`).
+
+#### Temporary URLs
+
+Alternatively, create a temporary public URL and give it to the client, so the browser doesn't stream through your API. The URL needs no app key, so only return it to users who are allowed to view the file. Anyone with the URL can access the file until it expires.
+
+For Backblaze B2 apps, the URL redirects to a pre-signed B2 URL that expires at the same time, so the file is downloaded straight from B2 and passes through neither your API nor the storage service. For SharePoint apps, and for images converted to WebP, the storage service serves the file.
+
+```ts
+@Get(":id/url")
+async getVideoUrl(@Param() params) {
+  // check user access, etc
+  const { url, expiresAt } = await this.storageService.temporaryUrl(params.id, {
+    expiresInSeconds: 3 * 60 * 60, // default 1 hour, max 24 hours
+  });
+  return { url, expiresAt };
+}
+```
+
+The URL stops working at expiry, including for a video that is already playing, so for video and audio set it to cover the expected viewing time. A `<video src>` works with no extra setup. Reading the file from JavaScript (e.g. `fetch`) on B2 apps requires CORS rules on the B2 bucket.
+
+#### Fetch part of a file
+
+`fetch` also accepts `range` for reading part of a file into memory. The response status is `206` when the range is applied.
+
+```ts
+const resp = await this.storageService.fetch(id, { range: "bytes=0-1023" });
 ```
 
 #### Run OCR on a file

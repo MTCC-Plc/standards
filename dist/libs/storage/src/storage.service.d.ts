@@ -1,10 +1,10 @@
 import { AxiosResponse } from "axios";
-import { ExtractFieldsOptions, ExtractFieldsResult, QueryStorageInput, StorageFetchOptions, StorageModuleOptions, StorageObject, UploadOptions } from "./storage.interface";
+import { ExtractFieldsOptions, ExtractFieldsResult, QueryStorageInput, StorageFetchOptions, StorageModuleOptions, StorageObject, TemporaryUrl, TemporaryUrlOptions, UploadOptions } from "./storage.interface";
 export declare class StorageService {
     private readonly config;
     constructor(config: StorageModuleOptions);
     private buildObjectEndpoint;
-    queryStorage<T>({ endpoint, method, body, headers, responseType, }: QueryStorageInput): Promise<AxiosResponse<T, any>>;
+    queryStorage<T>({ endpoint, method, body, headers, responseType, validateStatus, }: QueryStorageInput): Promise<AxiosResponse<T, any>>;
     /**
      * @param file Express.Multer.File object.
      * @param options optional OCR options to run during upload.
@@ -35,6 +35,8 @@ export declare class StorageService {
      * - `width` and `height` can be added for resizing images. Can only be resized
      *   down, not up. If only one is provided, the other will be auto-scaled to
      *   preserve aspect ratio.
+     * - `range` fetches only part of the object, e.g. `bytes=0-1023`. The
+     *   response status is 206 when the range is applied.
      */
     fetch(id: string, options?: StorageFetchOptions): Promise<AxiosResponse<File, any>>;
     /**
@@ -68,6 +70,11 @@ export declare class StorageService {
      * Serves a file from the storage service. Meant to be used at the end of the
      * controller method, where you can use the Res decorator.
      *
+     * The file is streamed through without being buffered in memory. The
+     * incoming request's Range, If-Range and If-None-Match headers are forwarded,
+     * so browsers can stream and seek in video and audio, and HEAD requests are
+     * answered without downloading the file.
+     *
      * Supported options:
      * - `original: true` serves the original stored object without WebP conversion.
      * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
@@ -75,8 +82,25 @@ export declare class StorageService {
      * - `width` and `height` can be added for resizing images. Can only be resized
      *   down, not up. If only one is provided, the other will be auto-scaled to
      *   preserve aspect ratio.
+     * - `range` overrides the incoming request's Range header.
      */
     serve(id: string, res: any, options?: StorageFetchOptions): Promise<void>;
+    /**
+     * @param id uuid given by the storage service
+     * @param options optional expiry for the URL
+     * @returns an unauthenticated URL to the object and when it expires.
+     * @description
+     * Creates a temporary public URL for an object. The URL needs no app key, so
+     * it can be used directly by browsers, e.g. as the src of a video, audio or
+     * img element, and supports streaming and seeking. Anyone with the URL can
+     * access the object until it expires, so only hand it to users who are
+     * allowed to view the object.
+     *
+     * For Backblaze B2 apps the URL redirects to a pre-signed B2 URL with the
+     * same expiry, so the file is downloaded straight from B2. Images converted
+     * to WebP, and SharePoint apps, are served by the storage service.
+     */
+    temporaryUrl(id: string, options?: TemporaryUrlOptions): Promise<TemporaryUrl>;
     /**
      * @param id uuid given by the storage service
      *

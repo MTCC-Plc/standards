@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import axios, { AxiosResponse } from "axios";
 import * as FormData from "form-data";
+import { pipeline, Readable } from "stream";
 import {
   ExtractFieldsOptions,
   ExtractFieldsResult,
@@ -17,8 +18,47 @@ import {
   StorageFetchOptions,
   StorageModuleOptions,
   StorageObject,
+  TemporaryUrl,
+  TemporaryUrlOptions,
   UploadOptions,
 } from "./storage.interface";
+
+/** Response headers from the storage service that `serve` passes through. */
+const SERVE_PASSTHROUGH_HEADERS = [
+  "content-length",
+  "content-disposition",
+  "content-type",
+  "cache-control",
+  "accept-ranges",
+  "content-range",
+  "etag",
+];
+
+/**
+ * Error bodies arrive as a buffer or stream for non-JSON response types, so
+ * they are decoded here to recover the storage service's error message.
+ */
+async function parseErrorData(data: any): Promise<any> {
+  try {
+    if (data instanceof Readable) {
+      data = await new Promise<Buffer>((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        data.on("data", (chunk: any) => chunks.push(Buffer.from(chunk)));
+        data.on("end", () => resolve(Buffer.concat(chunks)));
+        data.on("error", reject);
+      });
+    }
+    if (data instanceof ArrayBuffer) {
+      data = Buffer.from(data);
+    }
+    if (Buffer.isBuffer(data)) {
+      data = JSON.parse(data.toString("utf8"));
+    }
+    return data;
+  } catch {
+    return undefined;
+  }
+}
 
 @Injectable()
 export class StorageService {
@@ -53,6 +93,7 @@ export class StorageService {
     body,
     headers,
     responseType = undefined,
+    validateStatus = undefined,
   }: QueryStorageInput): Promise<AxiosResponse<T, any>> {
     const h = {
       Authorization: `${this.config.appKey}`,
@@ -66,10 +107,13 @@ export class StorageService {
         headers: h,
         data: body,
         responseType,
+        // an explicit undefined would disable axios' default 2xx check
+        ...(validateStatus ? { validateStatus } : {}),
       })
-      .catch((err) => {
+      .catch(async (err) => {
         if (err.response) {
-          const { status, data } = err.response;
+          const { status } = err.response;
+          const data = await parseErrorData(err.response.data);
           const errorMessage =
             data?.error || data?.message || `Storage Service Error`;
 
@@ -162,6 +206,8 @@ export class StorageService {
    * - `width` and `height` can be added for resizing images. Can only be resized
    *   down, not up. If only one is provided, the other will be auto-scaled to
    *   preserve aspect ratio.
+   * - `range` fetches only part of the object, e.g. `bytes=0-1023`. The
+   *   response status is 206 when the range is applied.
    */
   async fetch(
     id: string,
@@ -171,6 +217,7 @@ export class StorageService {
       endpoint: this.buildObjectEndpoint(id, options),
       method: "get",
       responseType: "arraybuffer",
+      headers: options?.range ? { Range: options.range } : undefined,
     });
     return resp;
   }
@@ -225,6 +272,11 @@ export class StorageService {
    * Serves a file from the storage service. Meant to be used at the end of the
    * controller method, where you can use the Res decorator.
    *
+   * The file is streamed through without being buffered in memory. The
+   * incoming request's Range, If-Range and If-None-Match headers are forwarded,
+   * so browsers can stream and seek in video and audio, and HEAD requests are
+   * answered without downloading the file.
+   *
    * Supported options:
    * - `original: true` serves the original stored object without WebP conversion.
    * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
@@ -232,21 +284,95 @@ export class StorageService {
    * - `width` and `height` can be added for resizing images. Can only be resized
    *   down, not up. If only one is provided, the other will be auto-scaled to
    *   preserve aspect ratio.
+   * - `range` overrides the incoming request's Range header.
    */
   async serve(id: string, res: any, options?: StorageFetchOptions) {
-    const resp = await this.queryStorage<string>({
+    // express exposes the request as res.req
+    const req = res.req;
+    const incoming: Record<string, string | undefined> = req?.headers ?? {};
+    const headers: Record<string, string> = {};
+    if (options?.range) {
+      headers.Range = options.range;
+    } else if (incoming.range) {
+      headers.Range = incoming.range;
+      if (incoming["if-range"]) {
+        headers["If-Range"] = incoming["if-range"];
+      }
+    }
+    if (incoming["if-none-match"]) {
+      headers["If-None-Match"] = incoming["if-none-match"];
+    }
+    const method = req?.method === "HEAD" ? "head" : "get";
+
+    const resp = await this.queryStorage<Readable>({
       endpoint: this.buildObjectEndpoint(id, options),
-      method: "get",
-      responseType: "arraybuffer",
+      method,
+      headers,
+      responseType: "stream",
+      validateStatus: (status) =>
+        (status >= 200 && status < 300) || status === 304 || status === 416,
     });
-    res.set({
-      "Content-Length": resp.headers["content-length"] ?? "",
-      "Content-Disposition": resp.headers["content-disposition"] ?? "",
-      "Content-Type":
-        resp.headers["content-type"] ?? "application/octet-stream",
-      "Cache-Control": resp.headers["cache-control"] ?? "no-cache",
+
+    const outgoing: Record<string, string> = {};
+    for (const name of SERVE_PASSTHROUGH_HEADERS) {
+      const value = resp.headers[name];
+      if (value !== undefined && value !== null) {
+        outgoing[name] = `${value}`;
+      }
+    }
+    if (resp.status !== 304) {
+      outgoing["content-type"] ??= "application/octet-stream";
+      outgoing["cache-control"] ??= "no-cache";
+    }
+    res.status(resp.status);
+    res.set(outgoing);
+
+    const body = resp.data;
+    if (method === "head" || resp.status === 304) {
+      body.destroy();
+      res.end();
+      return;
+    }
+    // Resolves once the response finishes or the client disconnects (e.g. a
+    // video player seeking); in both cases the upstream request is closed.
+    await new Promise<void>((resolve) => {
+      pipeline(body, res, () => resolve());
     });
-    res.end(resp.data);
+  }
+
+  /**
+   * @param id uuid given by the storage service
+   * @param options optional expiry for the URL
+   * @returns an unauthenticated URL to the object and when it expires.
+   * @description
+   * Creates a temporary public URL for an object. The URL needs no app key, so
+   * it can be used directly by browsers, e.g. as the src of a video, audio or
+   * img element, and supports streaming and seeking. Anyone with the URL can
+   * access the object until it expires, so only hand it to users who are
+   * allowed to view the object.
+   *
+   * For Backblaze B2 apps the URL redirects to a pre-signed B2 URL with the
+   * same expiry, so the file is downloaded straight from B2. Images converted
+   * to WebP, and SharePoint apps, are served by the storage service.
+   */
+  async temporaryUrl(
+    id: string,
+    options?: TemporaryUrlOptions,
+  ): Promise<TemporaryUrl> {
+    const resp = await this.queryStorage<{
+      id: string;
+      path: string;
+      expiresAt: string;
+    }>({
+      endpoint: `s/${id}/temp`,
+      method: "post",
+      body: { expiresInSeconds: options?.expiresInSeconds },
+    });
+    return {
+      id: resp.data.id,
+      url: `${this.config.host}/${resp.data.path}`,
+      expiresAt: resp.data.expiresAt,
+    };
   }
 
   /**

@@ -22,6 +22,45 @@ exports.StorageService = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("axios");
 const FormData = require("form-data");
+const stream_1 = require("stream");
+/** Response headers from the storage service that `serve` passes through. */
+const SERVE_PASSTHROUGH_HEADERS = [
+    "content-length",
+    "content-disposition",
+    "content-type",
+    "cache-control",
+    "accept-ranges",
+    "content-range",
+    "etag",
+];
+/**
+ * Error bodies arrive as a buffer or stream for non-JSON response types, so
+ * they are decoded here to recover the storage service's error message.
+ */
+function parseErrorData(data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            if (data instanceof stream_1.Readable) {
+                data = yield new Promise((resolve, reject) => {
+                    const chunks = [];
+                    data.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+                    data.on("end", () => resolve(Buffer.concat(chunks)));
+                    data.on("error", reject);
+                });
+            }
+            if (data instanceof ArrayBuffer) {
+                data = Buffer.from(data);
+            }
+            if (Buffer.isBuffer(data)) {
+                data = JSON.parse(data.toString("utf8"));
+            }
+            return data;
+        }
+        catch (_a) {
+            return undefined;
+        }
+    });
+}
 let StorageService = class StorageService {
     constructor(config) {
         this.config = config;
@@ -47,19 +86,14 @@ let StorageService = class StorageService {
         return query ? `s/${id}?${query}` : `s/${id}`;
     }
     queryStorage(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ endpoint, method, body, headers, responseType = undefined, }) {
+        return __awaiter(this, arguments, void 0, function* ({ endpoint, method, body, headers, responseType = undefined, validateStatus = undefined, }) {
             const h = Object.assign({ Authorization: `${this.config.appKey}`, "Content-Type": "application/json" }, headers);
             const result = yield axios_1.default
-                .request({
-                url: `${this.config.host}/${endpoint}`,
-                method,
-                headers: h,
-                data: body,
-                responseType,
-            })
-                .catch((err) => {
+                .request(Object.assign({ url: `${this.config.host}/${endpoint}`, method, headers: h, data: body, responseType }, (validateStatus ? { validateStatus } : {})))
+                .catch((err) => __awaiter(this, void 0, void 0, function* () {
                 if (err.response) {
-                    const { status, data } = err.response;
+                    const { status } = err.response;
+                    const data = yield parseErrorData(err.response.data);
                     const errorMessage = (data === null || data === void 0 ? void 0 : data.error) || (data === null || data === void 0 ? void 0 : data.message) || `Storage Service Error`;
                     switch (status) {
                         case 400:
@@ -83,7 +117,7 @@ let StorageService = class StorageService {
                     // Network error or other non-HTTP error
                     throw new common_1.InternalServerErrorException(`Storage Service: ${err.message || "Network error"}`);
                 }
-            });
+            }));
             return result;
         });
     }
@@ -141,6 +175,8 @@ let StorageService = class StorageService {
      * - `width` and `height` can be added for resizing images. Can only be resized
      *   down, not up. If only one is provided, the other will be auto-scaled to
      *   preserve aspect ratio.
+     * - `range` fetches only part of the object, e.g. `bytes=0-1023`. The
+     *   response status is 206 when the range is applied.
      */
     fetch(id, options) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -148,6 +184,7 @@ let StorageService = class StorageService {
                 endpoint: this.buildObjectEndpoint(id, options),
                 method: "get",
                 responseType: "arraybuffer",
+                headers: (options === null || options === void 0 ? void 0 : options.range) ? { Range: options.range } : undefined,
             });
             return resp;
         });
@@ -200,6 +237,11 @@ let StorageService = class StorageService {
      * Serves a file from the storage service. Meant to be used at the end of the
      * controller method, where you can use the Res decorator.
      *
+     * The file is streamed through without being buffered in memory. The
+     * incoming request's Range, If-Range and If-None-Match headers are forwarded,
+     * so browsers can stream and seek in video and audio, and HEAD requests are
+     * answered without downloading the file.
+     *
      * Supported options:
      * - `original: true` serves the original stored object without WebP conversion.
      * - `lossy: true` forces lossy WebP for PNGs, which are otherwise lossless by default.
@@ -207,22 +249,88 @@ let StorageService = class StorageService {
      * - `width` and `height` can be added for resizing images. Can only be resized
      *   down, not up. If only one is provided, the other will be auto-scaled to
      *   preserve aspect ratio.
+     * - `range` overrides the incoming request's Range header.
      */
     serve(id, res, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d;
+            var _a, _b, _c;
+            // express exposes the request as res.req
+            const req = res.req;
+            const incoming = (_a = req === null || req === void 0 ? void 0 : req.headers) !== null && _a !== void 0 ? _a : {};
+            const headers = {};
+            if (options === null || options === void 0 ? void 0 : options.range) {
+                headers.Range = options.range;
+            }
+            else if (incoming.range) {
+                headers.Range = incoming.range;
+                if (incoming["if-range"]) {
+                    headers["If-Range"] = incoming["if-range"];
+                }
+            }
+            if (incoming["if-none-match"]) {
+                headers["If-None-Match"] = incoming["if-none-match"];
+            }
+            const method = (req === null || req === void 0 ? void 0 : req.method) === "HEAD" ? "head" : "get";
             const resp = yield this.queryStorage({
                 endpoint: this.buildObjectEndpoint(id, options),
-                method: "get",
-                responseType: "arraybuffer",
+                method,
+                headers,
+                responseType: "stream",
+                validateStatus: (status) => (status >= 200 && status < 300) || status === 304 || status === 416,
             });
-            res.set({
-                "Content-Length": (_a = resp.headers["content-length"]) !== null && _a !== void 0 ? _a : "",
-                "Content-Disposition": (_b = resp.headers["content-disposition"]) !== null && _b !== void 0 ? _b : "",
-                "Content-Type": (_c = resp.headers["content-type"]) !== null && _c !== void 0 ? _c : "application/octet-stream",
-                "Cache-Control": (_d = resp.headers["cache-control"]) !== null && _d !== void 0 ? _d : "no-cache",
+            const outgoing = {};
+            for (const name of SERVE_PASSTHROUGH_HEADERS) {
+                const value = resp.headers[name];
+                if (value !== undefined && value !== null) {
+                    outgoing[name] = `${value}`;
+                }
+            }
+            if (resp.status !== 304) {
+                (_b = outgoing["content-type"]) !== null && _b !== void 0 ? _b : (outgoing["content-type"] = "application/octet-stream");
+                (_c = outgoing["cache-control"]) !== null && _c !== void 0 ? _c : (outgoing["cache-control"] = "no-cache");
+            }
+            res.status(resp.status);
+            res.set(outgoing);
+            const body = resp.data;
+            if (method === "head" || resp.status === 304) {
+                body.destroy();
+                res.end();
+                return;
+            }
+            // Resolves once the response finishes or the client disconnects (e.g. a
+            // video player seeking); in both cases the upstream request is closed.
+            yield new Promise((resolve) => {
+                (0, stream_1.pipeline)(body, res, () => resolve());
             });
-            res.end(resp.data);
+        });
+    }
+    /**
+     * @param id uuid given by the storage service
+     * @param options optional expiry for the URL
+     * @returns an unauthenticated URL to the object and when it expires.
+     * @description
+     * Creates a temporary public URL for an object. The URL needs no app key, so
+     * it can be used directly by browsers, e.g. as the src of a video, audio or
+     * img element, and supports streaming and seeking. Anyone with the URL can
+     * access the object until it expires, so only hand it to users who are
+     * allowed to view the object.
+     *
+     * For Backblaze B2 apps the URL redirects to a pre-signed B2 URL with the
+     * same expiry, so the file is downloaded straight from B2. Images converted
+     * to WebP, and SharePoint apps, are served by the storage service.
+     */
+    temporaryUrl(id, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resp = yield this.queryStorage({
+                endpoint: `s/${id}/temp`,
+                method: "post",
+                body: { expiresInSeconds: options === null || options === void 0 ? void 0 : options.expiresInSeconds },
+            });
+            return {
+                id: resp.data.id,
+                url: `${this.config.host}/${resp.data.path}`,
+                expiresAt: resp.data.expiresAt,
+            };
         });
     }
     /**
