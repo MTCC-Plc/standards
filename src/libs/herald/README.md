@@ -74,6 +74,30 @@ export class RandomService {
 }
 ```
 
+### Priority notifications
+
+Herald sends notifications through a queue, so during a burst of bulk notifications a new one can wait several minutes before it is sent. For time-sensitive messages such as OTPs, pass `priority: true` to send through a separate priority queue with its own workers.
+
+```ts
+await this.heraldService.sendEmail({
+  email: "someone@example.com",
+  message: `Your OTP code is: ${otp}`,
+  priority: true,
+});
+
+await this.heraldService.sendSMS(phone, `Your OTP code is: ${otp}`, {
+  priority: true,
+});
+
+await this.heraldService.create({
+  message: "...",
+  recipients: [{ rcno: 7145 }],
+  priority: true,
+});
+```
+
+Only use it for messages that are useless if delayed. If everything is sent as priority, the priority queue backs up the same way. Failed priority notifications are retried with a shorter backoff (at most 30 seconds between attempts).
+
 ### Sending adaptive cards over Teams
 
 Pass `adaptiveCard` to `create()` to have the `teams` scope send an [adaptive card](https://adaptivecards.io/designer) instead of a plain text message. The card is accepted as the card object or as a JSON string of it, and is sent to Teams as given, so the `url` link and the source footer that the normal Teams message adds have to be part of the card itself.

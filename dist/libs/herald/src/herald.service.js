@@ -96,7 +96,11 @@ let HeraldService = HeraldService_1 = class HeraldService {
             yield this.queryHerald("notification", "post", Object.assign(Object.assign({}, input), { url: this.buildUrl(input.url), source }));
         });
     }
-    sendSMS(phone, message) {
+    /**
+     * @param options.priority Send through Herald's priority queue. Only for
+     * time-sensitive messages such as OTPs.
+     */
+    sendSMS(phone, message, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const recipients = this.filterRecipients([{ phone }]);
             if (!recipients)
@@ -105,11 +109,12 @@ let HeraldService = HeraldService_1 = class HeraldService {
                 message,
                 recipients,
                 source: this.config.source,
+                priority: options === null || options === void 0 ? void 0 : options.priority,
             });
         });
     }
     sendEmail(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ email, message, url, emailHtml, emailSubject, }) {
+        return __awaiter(this, arguments, void 0, function* ({ email, message, url, emailHtml, emailSubject, priority, }) {
             const recipients = this.filterRecipients([{ email }]);
             if (!recipients)
                 return;
@@ -120,6 +125,7 @@ let HeraldService = HeraldService_1 = class HeraldService {
                 url: this.buildUrl(url),
                 emailHtml,
                 emailSubject,
+                priority,
             });
         });
     }

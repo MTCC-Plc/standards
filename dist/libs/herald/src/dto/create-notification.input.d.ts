@@ -10,6 +10,7 @@ export declare class CreateNotificationInput {
     scopes?: string[];
     sendAllScopes?: boolean;
     ignoreLimit?: boolean;
+    priority?: boolean;
 }
 export declare class NotificationRecipientInput {
     rcno?: number;

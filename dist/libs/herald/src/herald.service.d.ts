@@ -23,8 +23,14 @@ export declare class HeraldService {
      */
     private buildUrl;
     create(input: CreateNotificationInput): Promise<void>;
-    sendSMS(phone: string, message: string): Promise<void>;
-    sendEmail({ email, message, url, emailHtml, emailSubject, }: SendEmailInput): Promise<void>;
+    /**
+     * @param options.priority Send through Herald's priority queue. Only for
+     * time-sensitive messages such as OTPs.
+     */
+    sendSMS(phone: string, message: string, options?: {
+        priority?: boolean;
+    }): Promise<void>;
+    sendEmail({ email, message, url, emailHtml, emailSubject, priority, }: SendEmailInput): Promise<void>;
     sendEmailWithAttachments({ recipients, message, source, url, emailHtml, emailSubject, attachments, }: SendEmailWithAttachmentsInput): Promise<void>;
     get({ source, rcno, email, phone, read, beforeId, }: GetNotificationClientInput): Promise<RecipientNotification[]>;
     read(input: ReadNotificationInput): Promise<void>;

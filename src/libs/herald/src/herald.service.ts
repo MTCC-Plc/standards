@@ -108,13 +108,22 @@ export class HeraldService {
     });
   }
 
-  async sendSMS(phone: string, message: string) {
+  /**
+   * @param options.priority Send through Herald's priority queue. Only for
+   * time-sensitive messages such as OTPs.
+   */
+  async sendSMS(
+    phone: string,
+    message: string,
+    options?: { priority?: boolean },
+  ) {
     const recipients = this.filterRecipients([{ phone }]);
     if (!recipients) return;
     await this.queryHerald("notification/sms", "post", {
       message,
       recipients,
       source: this.config.source,
+      priority: options?.priority,
     });
   }
 
@@ -124,6 +133,7 @@ export class HeraldService {
     url,
     emailHtml,
     emailSubject,
+    priority,
   }: SendEmailInput) {
     const recipients = this.filterRecipients([{ email }]);
     if (!recipients) return;
@@ -134,6 +144,7 @@ export class HeraldService {
       url: this.buildUrl(url),
       emailHtml,
       emailSubject,
+      priority,
     });
   }
 
