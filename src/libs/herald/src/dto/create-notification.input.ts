@@ -53,6 +53,13 @@ export class CreateNotificationInput {
   @IsBoolean()
   @IsOptional()
   ignoreLimit?: boolean = false;
+
+  // Sends through Herald's priority queue, which has its own workers, so the
+  // notification does not wait behind bulk notifications. Only for
+  // time-sensitive messages such as OTPs.
+  @IsBoolean()
+  @IsOptional()
+  priority?: boolean;
 }
 
 export class NotificationRecipientInput {

@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsOptional, IsString } from "class-validator";
 
 export class SendEmailInput {
   @IsString()
@@ -18,4 +18,10 @@ export class SendEmailInput {
   @IsString()
   @IsOptional()
   emailSubject?: string;
+
+  // Sends through Herald's priority queue. Only for time-sensitive messages
+  // such as OTPs.
+  @IsBoolean()
+  @IsOptional()
+  priority?: boolean;
 }

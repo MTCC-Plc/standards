@@ -68,6 +68,11 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateNotificationInput.prototype, "ignoreLimit", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateNotificationInput.prototype, "priority", void 0);
 class NotificationRecipientInput {
     constructor() {
         this.flaggedForFetch = false;

@@ -4,4 +4,5 @@ export declare class SendEmailInput {
     url?: string;
     emailHtml?: string;
     emailSubject?: string;
+    priority?: boolean;
 }
