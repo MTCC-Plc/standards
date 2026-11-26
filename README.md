@@ -29,6 +29,7 @@ Check the library readmes for details.
 - [Standard Logger](./src/libs/logger/README.md) - Standard logger for a Nestjs app.
 - [Search](./src/libs/search/README.md) - Integration with the Meilisearch API.
 - [Storage](./src/libs/storage/README.md) - Integration with the Storage Service.
+- [Trail](./src/libs/trail/README.md) - Audit trail interceptor and cross-service trace ids.
 - [Napis](./src/libs/napis/README.md) - Integration with the National APIs.
 
 ### Usage
