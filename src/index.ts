@@ -6,3 +6,4 @@ export * from "./libs/logger";
 export * from "./libs/napis/src";
 export * from "./libs/search/src";
 export * from "./libs/storage/src";
+export * from "./libs/trail";

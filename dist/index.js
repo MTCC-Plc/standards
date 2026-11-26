@@ -22,3 +22,4 @@ __exportStar(require("./libs/logger"), exports);
 __exportStar(require("./libs/napis/src"), exports);
 __exportStar(require("./libs/search/src"), exports);
 __exportStar(require("./libs/storage/src"), exports);
+__exportStar(require("./libs/trail"), exports);
