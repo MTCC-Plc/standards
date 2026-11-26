@@ -18,6 +18,7 @@ function gqlContext(opts: {
   operation?: string;
   operationName?: string;
   field?: string;
+  alias?: string;
   variables?: any;
 }): ExecutionContext {
   const info = {
@@ -25,7 +26,9 @@ function gqlContext(opts: {
       operation: opts.operation ?? "query",
       name: opts.operationName ? { value: opts.operationName } : undefined,
     },
-    path: { key: opts.field ?? "someField" },
+    fieldName: opts.field ?? "someField",
+    // As in graphql-js, path.key is the alias when the client uses one.
+    path: { key: opts.alias ?? opts.field ?? "someField" },
     variableValues: opts.variables ?? {},
   };
   const args = [{}, {}, { req: opts.req ?? {}, ...(opts.ctx ?? {}) }, info];
@@ -102,6 +105,17 @@ describe("TrailAuditInterceptor", () => {
       isError: false,
     });
     expect(typeof posts[0].entry.requestId).toBe("string");
+  });
+
+  it("records the field name, not the alias, for aliased fields", () => {
+    const { interceptor } = make();
+    const entry = interceptor.buildEntry(
+      gqlContext({ field: "workflowRequestById", alias: "w230393" }),
+      performance.now(),
+      {},
+      false
+    );
+    expect(entry?.operationName).toBe("workflowRequestById");
   });
 
   it("can record the client operation name instead", () => {

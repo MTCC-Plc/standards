@@ -138,8 +138,11 @@ class TrailAuditInterceptor {
             operationType = (_c = info === null || info === void 0 ? void 0 : info.operation) === null || _c === void 0 ? void 0 : _c.operation;
             operationName =
                 this.options.gqlOperationName === "operation"
-                    ? (_f = (_e = (_d = info === null || info === void 0 ? void 0 : info.operation) === null || _d === void 0 ? void 0 : _d.name) === null || _e === void 0 ? void 0 : _e.value) !== null && _f !== void 0 ? _f : `${(_h = (_g = info === null || info === void 0 ? void 0 : info.path) === null || _g === void 0 ? void 0 : _g.key) !== null && _h !== void 0 ? _h : ""}`
-                    : `${(_o = (_k = (_j = info === null || info === void 0 ? void 0 : info.path) === null || _j === void 0 ? void 0 : _j.key) !== null && _k !== void 0 ? _k : (_m = (_l = info === null || info === void 0 ? void 0 : info.operation) === null || _l === void 0 ? void 0 : _l.name) === null || _m === void 0 ? void 0 : _m.value) !== null && _o !== void 0 ? _o : ""}`;
+                    ? (_f = (_e = (_d = info === null || info === void 0 ? void 0 : info.operation) === null || _d === void 0 ? void 0 : _d.name) === null || _e === void 0 ? void 0 : _e.value) !== null && _f !== void 0 ? _f : `${(_g = info === null || info === void 0 ? void 0 : info.fieldName) !== null && _g !== void 0 ? _g : ""}`
+                    : // fieldName, not path.key: path.key is the alias when the client
+                        // aliases fields (e.g. `w123: workflowRequestById(...)`), which
+                        // would record every alias as a separate operation.
+                        `${(_o = (_k = (_h = info === null || info === void 0 ? void 0 : info.fieldName) !== null && _h !== void 0 ? _h : (_j = info === null || info === void 0 ? void 0 : info.path) === null || _j === void 0 ? void 0 : _j.key) !== null && _k !== void 0 ? _k : (_m = (_l = info === null || info === void 0 ? void 0 : info.operation) === null || _l === void 0 ? void 0 : _l.name) === null || _m === void 0 ? void 0 : _m.value) !== null && _o !== void 0 ? _o : ""}`;
             input = info === null || info === void 0 ? void 0 : info.variableValues;
         }
         else {
