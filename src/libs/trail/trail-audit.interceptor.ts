@@ -243,8 +243,11 @@ export class TrailAuditInterceptor implements NestInterceptor {
       operationType = info?.operation?.operation;
       operationName =
         this.options.gqlOperationName === "operation"
-          ? info?.operation?.name?.value ?? `${info?.path?.key ?? ""}`
-          : `${info?.path?.key ?? info?.operation?.name?.value ?? ""}`;
+          ? info?.operation?.name?.value ?? `${info?.fieldName ?? ""}`
+          : // fieldName, not path.key: path.key is the alias when the client
+            // aliases fields (e.g. `w123: workflowRequestById(...)`), which
+            // would record every alias as a separate operation.
+            `${info?.fieldName ?? info?.path?.key ?? info?.operation?.name?.value ?? ""}`;
       input = info?.variableValues;
     } else {
       request = context.switchToHttp().getRequest() ?? {};
